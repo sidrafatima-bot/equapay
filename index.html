@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Equapay Full App</title>
@@ -9,17 +10,26 @@
 <body>
 
 <div class="phone">
+    <div id="loadingSpinner" style="display:none; position:absolute; top:50%; left:50%;
+    transform:translate(-50%,-50%); z-index:999; font-size:30px;">⏳</div>
     <div id="overlay" class="overlay" onclick="toggleMenu()"></div>
 
     <!-- SIDEBAR -->
     <div id="sidebar" class="sidebar">
-<h3 id="sidebarName">Sidra Fatima</h3>
-        <p id="sidebarSettings" class="active-sidebar-link">Settings</p>
-        <p id="sidebarGroups" onclick="showPage('dashboard')">Groups</p>
+        <h3 id="sidebarName">User</h3>
+        <input type="text" id="profileNameInput" placeholder="Update display name"
+            style="width:100%; padding:7px 10px; border:1px solid #ddd; border-radius:8px; font-size:13px; box-sizing:border-box;">
+        <button onclick="window.updateUserName(document.getElementById('profileNameInput').value.trim())"
+            style="margin-top:6px; width:100%; padding:7px; background:#2d8cff; color:white; border:none; border-radius:8px; font-size:13px; cursor:pointer;">
+            Save Name
+        </button>
         <hr>
-        <p id="sidebarDark" onclick="setTheme('dark')">Dark mode</p>
-        <p id="sidebarLight" onclick="setTheme('light')">Light mode</p>
-        <p id="sidebarLanguage" onclick="showLanguagePicker(true)">Language</p>
+        <p id="sidebarSettings" class="active-sidebar-link">Settings</p>
+        <p id="sidebarGroups" onclick="window.showPage('dashboard')">Groups</p>
+        <hr>
+        <p id="sidebarDark" onclick="window.setTheme('dark')">Dark mode</p>
+        <p id="sidebarLight" onclick="window.setTheme('light')">Light mode</p>
+        <p id="sidebarLanguage" onclick="window.showLanguagePicker(true)">Language</p>
         <div id="languagePicker" class="language-picker">
             <select id="langSelect" onchange="applyLanguage(this.value)" class="lang-select">
                 <option value="english">🇬🇧 English</option>
@@ -29,29 +39,38 @@
             </select>
         </div>
         <div style="margin:8px 0;">
-    <label style="font-size:14px;">Currency</label>
-    <select id="currencySelect" onchange="changeCurrency(this.value)" class="lang-select">
-        <option value="₹">₹ INR</option>
-        <option value="$">$ USD</option>
-        <option value="€">€ EUR</option>
-        <option value="£">£ GBP</option>
-        <option value="¥">¥ JPY</option>
-        <option value="₩">₩ KRW</option>
-        <option value="₺">₺ TRY</option>
-        <option value="﷼">﷼ SAR</option>
-    </select>
-</div>
+            <label style="font-size:14px;">Currency</label>
+            <select id="currencySelect" onchange="changeCurrency(this.value)" class="lang-select">
+                <option value="₹">₹ INR</option>
+                <option value="$">$ USD</option>
+                <option value="€">€ EUR</option>
+                <option value="£">£ GBP</option>
+                <option value="¥">¥ JPY</option>
+                <option value="₩">₩ KRW</option>
+                <option value="₺">₺ TRY</option>
+                <option value="﷼">﷼ SAR</option>
+            </select>
+        </div>
         <div style="margin:8px 0;">
-    <label style="font-size:14px;">Split type</label>
-    <select id="splitSelect" onchange="changeSplit(this.value)" class="lang-select">
-    <option value="Equal" id="optEqual">Equal</option>
-    <option value="Percentage" id="optPercentage">Percentage</option>
-    <option value="Exact" id="optExact">Exact Amount</option>
-    <option value="Share" id="optShare">By Shares</option>
-</select>
-</div>
+            <label style="font-size:14px;">Split type</label>
+            <select id="splitSelect" onchange="changeSplit(this.value)" class="lang-select">
+                <option value="Equal" id="optEqual">Equal</option>
+                <option value="Percentage" id="optPercentage">Percentage</option>
+                <option value="Exact" id="optExact">Exact Amount</option>
+                <option value="Share" id="optShare">By Shares</option>
+            </select>
+        </div>
         <p id="sidebarNotif" onclick="toggleNotifications()">Notifications <span class="float-right">ON</span></p>
-        <p id="sidebarLogout" class="logout-link" onclick="showPage('welcome')">Logout</p>
+        <p id="sidebarLogout" class="logout-link" onclick="window.showPage('welcome')">Logout</p>
+    </div>
+
+    <!-- BOTTOM NAV -->
+    <div id="bottomNav" class="bottom-nav">
+        <button onclick="window.showPage('dashboard')" class="nav-btn">🏠<span>Home</span></button>
+        <button onclick="window.showPage('addGroup')" class="nav-btn">👥<span>Groups</span></button>
+        <button id="navAddBtn" onclick="addExpenseFromNav()" class="nav-btn nav-plus">+</button>
+        <button onclick="notifyOwed()" class="nav-btn">🔔<span>Remind</span></button>
+        <button onclick="toggleMenu()" class="nav-btn">☰<span>Menu</span></button>
     </div>
 
     <!-- PAGE: WELCOME -->
@@ -62,7 +81,7 @@
         <div class="welcome-text">
             <h1>Hello, User👋</h1>
             <p>Welcome to Equapay</p>
-            <button class="primary-btn start-btn" onclick="showPage('login')">Get Started</button>
+            <button class="primary-btn start-btn" onclick="window.showPage('login')">Get Started</button>
         </div>
     </div>
 
@@ -71,16 +90,23 @@
         <img src="logo.png" class="login-logo">
         <p class="tagline">Manage shared expenses without the stress.</p>
         <div class="tabs">
-            <button class="tab active-tab" onclick="firebaseSignIn()">Sign In</button>
-            <button class="tab" onclick="firebaseSignUp()">Sign Up</button>
+            <button class="tab active-tab" id="signInTab" onclick="window.switchTab('signin')">Sign In</button>
+            <button class="tab" id="signUpTab" onclick="window.switchTab('signup')">Sign Up</button>
         </div>
-        <input type="text" placeholder="Email or Phone Number">
-        <input type="password" placeholder="Password">
-        <button class="primary-btn" onclick="firebaseSignIn()">Sign In</button>
+        <div id="signInForm">
+            <input type="text" id="signInEmail" placeholder="Email">
+            <input type="password" id="signInPass" placeholder="Password">
+            <button class="primary-btn" onclick="firebaseSignIn()">Sign In</button>
+        </div>
+        <div id="signUpForm" style="display:none;">
+            <input type="text" id="signUpEmail" placeholder="Email">
+            <input type="password" id="signUpPass" placeholder="Password">
+            <button class="primary-btn" onclick="firebaseSignUp()">Sign Up</button>
+        </div>
         <p class="or-text">OR CONTINUE WITH</p>
         <div class="social-btns">
             <button class="tab social-btn" onclick="googleSignIn()">Google</button>
-            <button class="tab social-btn" onclick="showPage('dashboard')">Apple</button>
+            <button class="tab social-btn" onclick="window.showPage('dashboard')">Apple</button>
         </div>
     </div>
 
@@ -98,59 +124,99 @@
             <p><b>No groups yet</b></p>
             <p class="hint">Tap + to create your first group</p>
         </div>
-        <button class="fab" onclick="showPage('addGroup')">+</button>
     </div>
 
     <!-- PAGE: GROUP DETAIL -->
     <div class="page" id="apartment">
         <div class="header row-header">
-            <div onclick="showPage('dashboard')" class="back-arrow">←</div>
+            <div onclick="window.showPage('dashboard')" class="back-arrow">←</div>
             <h3 id="groupTitle">Group</h3>
+            <div style="display:flex; gap:10px; margin-left:auto;">
+                <button onclick="showEditMembers()" title="Edit Members"
+                    style="background:none; border:none; font-size:20px; cursor:pointer;">✏️</button>
+                <button onclick="shareExpenseSummary()" title="Share Summary"
+                    style="background:none; border:none; font-size:20px; cursor:pointer;">📤</button>
+                <button onclick="confirmDeleteGroup()" title="Delete Group"
+                    style="background:none; border:none; font-size:20px; cursor:pointer;">🗑️</button>
+            </div>
         </div>
-        <div class="chart-container" id="chartMembers"></div>
+
+        <div id="editMembersPanel" style="display:none; background:#f0f7ff; padding:12px; border-radius:12px; margin:8px 0;">
+            <p style="font-weight:bold; font-size:13px; margin:0 0 8px;">✏️ Edit Members</p>
+            <input type="text" id="editMembersInput"
+                style="width:100%; padding:8px; border:1px solid #ccc; border-radius:8px; font-size:13px; box-sizing:border-box;"
+                placeholder="Comma-separated, e.g. Sidra, Sania, Ali">
+            <div style="display:flex; gap:8px; margin-top:8px;">
+                <button onclick="saveEditedMembers()"
+                    style="flex:1; background:#2d8cff; color:white; border:none; padding:8px; border-radius:8px; cursor:pointer; font-size:13px;">
+                    Save
+                </button>
+                <button onclick="document.getElementById('editMembersPanel').style.display='none'"
+                    style="flex:1; background:#eee; border:none; padding:8px; border-radius:8px; cursor:pointer; font-size:13px;">
+                    Cancel
+                </button>
+            </div>
+        </div>
+
+        <div class="chart-container" style="position:relative;">
+            <canvas id="pieChart" height="200"></canvas>
+            <div id="chartMembers" style="display:flex; justify-content:center; gap:12px; flex-wrap:wrap; margin-top:8px;"></div>
+        </div>
+
+        <input type="text" id="expenseSearch" placeholder="🔍 Search expenses..."
+            oninput="filterExpenses(this.value)"
+            style="width:100%; padding:10px; border:1px solid #eee; border-radius:10px;
+                   font-size:13px; box-sizing:border-box; margin-bottom:8px;">
+
         <div id="resultContainer"></div>
-        <button class="fab" onclick="showPage('addExpense')">+</button>
     </div>
 
     <!-- PAGE: ADD EXPENSE -->
-<div class="page" id="addExpense">
-    <div class="header">
-        <div onclick="showPage('apartment')" class="back-arrow">←</div>
-        <h3>Add Expense</h3>
+    <div class="page" id="addExpense">
+        <div class="header">
+            <div onclick="window.showPage('apartment')" class="back-arrow">←</div>
+            <h3>Add Expense</h3>
+        </div>
+        <label class="input-label">Category</label>
+        <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:12px;">
+            <button onclick="selectCategory(this,'🍔 Food')" class="cat-btn active">🍔 Food</button>
+            <button onclick="selectCategory(this,'🚗 Travel')" class="cat-btn">🚗 Travel</button>
+            <button onclick="selectCategory(this,'🏠 Rent')" class="cat-btn">🏠 Rent</button>
+            <button onclick="selectCategory(this,'🎉 Fun')" class="cat-btn">🎉 Fun</button>
+            <button onclick="selectCategory(this,'🛒 Shopping')" class="cat-btn">🛒 Shopping</button>
+            <button onclick="selectCategory(this,'💡 Bills')" class="cat-btn">💡 Bills</button>
+        </div>
+        <input type="hidden" id="categorySelect" value="🍔 Food">
+        <label class="input-label" id="itemNameLabel">Item Name:</label>
+        <input type="text" id="expName" placeholder="e.g. Electricity">
+        <button onclick="window.open('receipt-scanner.html','_blank','width=340,height=700')"
+            style="width:100%; padding:10px; border:2px dashed #2d8cff; border-radius:12px; background:#f0f7ff; color:#2d8cff; font-weight:bold; cursor:pointer; margin-bottom:12px;">
+            📸 Scan Receipt Instead
+        </button>
+        <label class="input-label" id="whoPaidLabel">Who Paid?</label>
+        <select id="payerSelect" class="payer-select"></select>
+        <div class="amount-section">
+            <p>Amount</p>
+            <input type="number" id="mainAmount" placeholder="0.00" class="amount-input" oninput="updateSplitFields()">
+        </div>
+        <label class="input-label" id="splitTypeLabel">Split Type</label>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:12px;">
+            <button id="splitBtnEqual" onclick="selectSplitType('Equal')" style="padding:10px; border-radius:10px; border:2px solid #2d8cff; background:#2d8cff; color:white; font-weight:bold; cursor:pointer;">⚖️ Equal</button>
+            <button id="splitBtnPercentage" onclick="selectSplitType('Percentage')" style="padding:10px; border-radius:10px; border:2px solid #eee; background:white; color:#555; font-weight:bold; cursor:pointer;">📊 Percent</button>
+            <button id="splitBtnExact" onclick="selectSplitType('Exact')" style="padding:10px; border-radius:10px; border:2px solid #eee; background:white; color:#555; font-weight:bold; cursor:pointer;">✏️ Exact</button>
+            <button id="splitBtnShare" onclick="selectSplitType('Share')" style="padding:10px; border-radius:10px; border:2px solid #eee; background:white; color:#555; font-weight:bold; cursor:pointer;">🔢 Shares</button>
+        </div>
+        <div id="splitCustomFields" style="display:none; margin-bottom:10px;">
+            <div id="splitInputsContainer"></div>
+            <p id="splitValidMsg" style="font-size:12px; margin-top:4px;"></p>
+        </div>
+        <button class="primary-btn" onclick="calculateSplit()">Confirm Split</button>
     </div>
-    <label class="input-label" id="itemNameLabel">Item Name:</label>
-    <input type="text" id="expName" placeholder="e.g. Electricity">
-    <button onclick="window.open('receipt-scanner.html','_blank','width=340,height=700')" 
-  style="width:100%; padding:10px; border:2px dashed #2d8cff; border-radius:12px; background:#f0f7ff; color:#2d8cff; font-weight:bold; cursor:pointer; margin-bottom:12px;">
-  📸 Scan Receipt Instead
-</button>
-    <label class="input-label" id="whoPaidLabel">Who Paid?</label>
-    <select id="payerSelect" class="payer-select"></select>
-    <div class="amount-section">
-        <p>Amount</p>
-        <input type="number" id="mainAmount" placeholder="0.00" class="amount-input" oninput="updateSplitFields()">
-    </div>
-
-    <label class="input-label" id="splitTypeLabel">Split Type</label>
-    <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:12px;">
-        <button id="splitBtnEqual" onclick="selectSplitType('Equal')" style="padding:10px; border-radius:10px; border:2px solid #2d8cff; background:#2d8cff; color:white; font-weight:bold; cursor:pointer;">⚖️ Equal</button>
-        <button id="splitBtnPercentage" onclick="selectSplitType('Percentage')" style="padding:10px; border-radius:10px; border:2px solid #eee; background:white; color:#555; font-weight:bold; cursor:pointer;">📊 Percent</button>
-        <button id="splitBtnExact" onclick="selectSplitType('Exact')" style="padding:10px; border-radius:10px; border:2px solid #eee; background:white; color:#555; font-weight:bold; cursor:pointer;">✏️ Exact</button>
-        <button id="splitBtnShare" onclick="selectSplitType('Share')" style="padding:10px; border-radius:10px; border:2px solid #eee; background:white; color:#555; font-weight:bold; cursor:pointer;">🔢 Shares</button>
-    </div>
-
-    <div id="splitCustomFields" style="display:none; margin-bottom:10px;">
-        <div id="splitInputsContainer"></div>
-        <p id="splitValidMsg" style="font-size:12px; margin-top:4px;"></p>
-    </div>
-
-    <button class="primary-btn" onclick="calculateSplit()">Confirm Split</button>
-</div>
 
     <!-- PAGE: ADD GROUP -->
     <div class="page" id="addGroup">
         <div class="header">
-            <div onclick="showPage('dashboard')" class="back-arrow">←</div>
+            <div onclick="window.showPage('dashboard')" class="back-arrow">←</div>
             <h3>New Group</h3>
         </div>
         <label class="input-label" id="groupNameLabel">Group Name:</label>
@@ -159,11 +225,12 @@
         <input type="text" id="groupMembers" placeholder="Add names (e.g. Sidra, Sania)">
         <label class="input-label" id="groupDescLabel">Description (optional):</label>
         <input type="text" id="groupDesc" placeholder="What is this group for?">
-        <button class="primary-btn" onclick="addNewGroup()">Create Group</button>
+        <button class="primary-btn" onclick="window.addNewGroup()">Create Group</button>
     </div>
 
 </div>
 
-<script type="module" src="script.js"></script>
+<script src="script.js" defer></script>
+<script type="module" src="backend.js"></script>
 </body>
 </html>

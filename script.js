@@ -1,76 +1,19 @@
-// ============================================================
-//  SECTION 1: FIREBASE SETUP & AUTH
-// ============================================================
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup }
-    from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-
-const firebaseConfig = {
-    apiKey: "AIzaSyBYJel4b02QXpbQU7tWc2dd1ns36hknUbY",
-    authDomain: "equapay-52729.firebaseapp.com",
-    projectId: "equapay-52729",
-    storageBucket: "equapay-52729.firebasestorage.app",
-    messagingSenderId: "100025932427",
-    appId: "1:100025932427:web:53cae98e55b45ca4ae528e"
-};
-
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-
-window.firebaseSignIn = function () {
-    const email = document.querySelector('#login input[type=text]').value.trim();
-    const pass = document.querySelector('#login input[type=password]').value.trim();
-    if (!email || !pass) { alert('Please enter email and password'); return; }
-    signInWithEmailAndPassword(auth, email, pass)
-        .then((result) => {
-            const name = result.user.displayName || email.split('@')[0];
-            document.getElementById('sidebarName').textContent = name;
-            showPage('dashboard');
-        })
-        .catch(() => alert('Wrong email or password!'));
-};
-
-window.firebaseSignUp = function () {
-    const email = document.querySelector('#login input[type=text]').value.trim();
-    const pass = document.querySelector('#login input[type=password]').value.trim();
-    if (!email || !pass) { alert('Please enter email and password'); return; }
-    createUserWithEmailAndPassword(auth, email, pass)
-        .then((result) => {
-            const name = result.user.displayName || email.split('@')[0];
-            document.getElementById('sidebarName').textContent = name;
-            showPage('dashboard');
-        })
-        .catch(err => alert(err.message));
-};
-
-window.googleSignIn = function () {
-    const provider = new GoogleAuthProvider();
-    signInWithPopup(auth, provider)
-        .then((result) => {
-            const name = result.user.displayName || 'User';
-            document.getElementById('sidebarName').textContent = name;
-            showPage('dashboard');
-        })
-        .catch(err => alert(err.message));
-};
-
-// ============================================================
-//  SECTION 2: APP STATE
-// ============================================================
-let groups = [];
-let currentGroup = null;
+window.groups = [];
+window.currentGroup = null;
 let currentCurrency = '₹';
 let currentSplitType = 'Equal';
 let currentLang = 'english';
+let notificationsEnabled = true;
 
-// ============================================================
-//  SECTION 3: PAGE NAVIGATION
-// ============================================================
 window.showPage = function (id) {
     document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
     document.getElementById(id).classList.add('active');
     const sidebar = document.getElementById('sidebar');
     if (sidebar.classList.contains('open')) toggleMenu();
+    const bottomNav = document.getElementById('bottomNav');
+    if (bottomNav) {
+        bottomNav.style.display = ['welcome', 'login'].includes(id) ? 'none' : 'flex';
+    }
 };
 
 window.toggleMenu = function () {
@@ -80,15 +23,23 @@ window.toggleMenu = function () {
     o.style.display = s.classList.contains('open') ? 'block' : 'none';
 };
 
-// ============================================================
-//  SECTION 4: GROUP MANAGEMENT
-// ============================================================
-window.addNewGroup = function () {
+window.addExpenseFromNav = function() {
+    if (window.currentGroup) {
+        window.showPage('addExpense');
+    } else {
+        alert('Please open a group first!');
+    }
+};
+
+window.addNewGroup = async function () {
     const groupName = document.getElementById('groupInput').value.trim();
     const membersInput = document.getElementById('groupMembers').value.trim();
     if (!groupName || !membersInput) { alert("Please enter group name and members"); return; }
     const membersArray = membersInput.split(',').map(m => m.trim());
-    groups.push({ name: groupName, members: membersArray, expenses: [], settled: [] });
+    const newGroup = { name: groupName, members: membersArray, expenses: [], settled: [] };
+    const id = await window.saveGroup(newGroup);
+    newGroup.id = id;
+    window.groups.push(newGroup);
     document.getElementById('groupInput').value = "";
     document.getElementById('groupMembers').value = "";
     document.getElementById('groupDesc').value = "";
@@ -100,201 +51,161 @@ window.renderDashboard = function () {
     const list = document.getElementById('groupList');
     const noMsg = document.getElementById('noGroupsMsg');
     list.innerHTML = '';
-    // Search functionality
-document.querySelector('.search-bar').oninput = function() {
-    const query = this.value.toLowerCase();
-    const cards = list.querySelectorAll('.expense-card');
-    cards.forEach(card => {
-        const name = card.querySelector('strong').textContent.toLowerCase();
-        card.style.display = name.includes(query) ? 'flex' : 'none';
-    });
-};
-    if (groups.length === 0) { noMsg.style.display = 'block'; return; }
+    if (window.groups.length === 0) { noMsg.style.display = 'block'; return; }
     noMsg.style.display = 'none';
     const t = translations[currentLang];
-    groups.forEach(function (group, index) {
-        const total = group.expenses.reduce((s, e) => s + e.amount, 0);
+    window.groups.forEach(function (group, index) {
+        const total = (group.expenses || []).reduce((s, e) => s + e.amount, 0);
         const card = document.createElement('div');
         card.className = 'expense-card';
         card.innerHTML = `
             <div><strong>${group.name}</strong><br>
-            <small>${group.members.length} ${t.members} • ${group.expenses.length} ${t.expenses}</small></div>
+            <small>${group.members.length} ${t.members} • ${(group.expenses || []).length} ${t.expenses}</small></div>
             <b class="${total > 0 ? 'red' : 'grey'}">${currentCurrency}${total}</b>`;
-        card.onclick = () => openGroup(index);
+        card.onclick = () => openGroup(index, group.id);
         const isDark = document.querySelector('.phone').style.background === 'rgb(26, 26, 26)';
-if (isDark) { card.style.background = '#2d2d2d'; card.style.color = 'white'; }
+        if (isDark) { card.style.background = '#2d2d2d'; card.style.color = 'white'; }
+        else { card.style.background = 'white'; card.style.color = '#333'; }
         list.appendChild(card);
     });
+    document.querySelector('.search-bar').oninput = function () {
+        const query = this.value.toLowerCase();
+        const cards = list.querySelectorAll('.expense-card');
+        cards.forEach(card => {
+            const name = card.querySelector('strong').textContent.toLowerCase();
+            card.style.display = name.includes(query) ? 'flex' : 'none';
+        });
+    };
 };
 
-window.openGroup = function (index) {
-    currentGroup = groups[index];
-    document.getElementById('groupTitle').innerText = currentGroup.name;
+window.openGroup = async function (index, id) {
+    showLoading();
+    let group = window.groups[index];
+    if (!group || (id && group.id !== id)) group = window.groups.find(g => g.id === id);
+    if (!group) { alert("Group not found, please refresh."); return; }
+    window.currentGroup = group;
+    const expenses = await window.loadExpenses(window.currentGroup.id);
+    window.currentGroup.expenses = expenses || [];
+    const settlements = await window.loadSettlements(window.currentGroup.id);
+    window.currentGroup.settled = settlements || [];
+    window.groups[index] = window.currentGroup;
+    document.getElementById('groupTitle').innerText = window.currentGroup.name;
     const payerSelect = document.getElementById('payerSelect');
-    payerSelect.innerHTML = currentGroup.members.map(m => `<option value="${m}">${m}</option>`).join('');
+    payerSelect.innerHTML = window.currentGroup.members.map(m => `<option value="${m}">${m}</option>`).join('');
     renderChart();
     renderExpenseLog();
     showPage('apartment');
+    hideLoading();
+    window.listenToGroup(window.currentGroup.id);
 };
 
-// ============================================================
-//  SECTION 5: SPLIT TYPE UI
-// ============================================================
 window.selectSplitType = function (type) {
     currentSplitType = type;
-
-    // Update button styles
     ['Equal', 'Percentage', 'Exact', 'Share'].forEach(t => {
         const btn = document.getElementById('splitBtn' + t);
         if (!btn) return;
-        if (t === type) {
-            btn.style.background = '#2d8cff';
-            btn.style.color = 'white';
-            btn.style.border = '2px solid #2d8cff';
-        } else {
-            btn.style.background = 'white';
-            btn.style.color = '#555';
-            btn.style.border = '2px solid #eee';
-        }
+        if (t === type) { btn.style.background = '#2d8cff'; btn.style.color = 'white'; btn.style.border = '2px solid #2d8cff'; }
+        else { btn.style.background = 'white'; btn.style.color = '#555'; btn.style.border = '2px solid #eee'; }
     });
-
-    // Show/hide custom fields
     const customDiv = document.getElementById('splitCustomFields');
-    if (customDiv) {
-        customDiv.style.display = type === 'Equal' ? 'none' : 'block';
-        updateSplitFields();
-    }
+    if (customDiv) { customDiv.style.display = type === 'Equal' ? 'none' : 'block'; updateSplitFields(); }
 };
 
 window.updateSplitFields = function () {
-    if (!currentGroup) return;
+    if (!window.currentGroup) return;
     const amt = parseFloat(document.getElementById('mainAmount').value) || 0;
     const container = document.getElementById('splitInputsContainer');
     const msg = document.getElementById('splitValidMsg');
     if (!container) return;
     container.innerHTML = '';
     msg.textContent = '';
-
     if (currentSplitType === 'Percentage') {
-        const equalPct = (100 / currentGroup.members.length).toFixed(1);
+        const equalPct = (100 / window.currentGroup.members.length).toFixed(1);
         msg.textContent = 'Must add up to 100%';
-        currentGroup.members.forEach(member => {
-            container.innerHTML += `
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-                    <span style="font-size:13px; width:80px;">${member}</span>
-                    <div style="display:flex; align-items:center; gap:4px;">
-                        <input type="number" id="input_${member}" value="${equalPct}"
-                            style="width:70px; padding:8px; border:1px solid #eee; border-radius:8px; text-align:right;"
-                            oninput="validateSplitInputs(${amt})">
-                        <span style="font-size:13px;">%</span>
-                    </div>
-                </div>`;
+        window.currentGroup.members.forEach(member => {
+            container.innerHTML += `<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+                <span style="font-size:13px; width:80px;">${member}</span>
+                <div style="display:flex; align-items:center; gap:4px;">
+                    <input type="number" id="input_${member}" value="${equalPct}"
+                        style="width:70px; padding:8px; border:1px solid #eee; border-radius:8px; text-align:right;"
+                        oninput="validateSplitInputs(${amt})">
+                    <span style="font-size:13px;">%</span>
+                </div></div>`;
         });
-
     } else if (currentSplitType === 'Exact') {
-        const equalAmt = amt > 0 ? (amt / currentGroup.members.length).toFixed(2) : '0';
+        const equalAmt = amt > 0 ? (amt / window.currentGroup.members.length).toFixed(2) : '0';
         msg.textContent = 'Must add up to ' + currentCurrency + amt;
-        currentGroup.members.forEach(member => {
-            container.innerHTML += `
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-                    <span style="font-size:13px; width:80px;">${member}</span>
-                    <div style="display:flex; align-items:center; gap:4px;">
-                        <span style="font-size:13px;">${currentCurrency}</span>
-                        <input type="number" id="input_${member}" value="${equalAmt}"
-                            style="width:70px; padding:8px; border:1px solid #eee; border-radius:8px; text-align:right;"
-                            oninput="validateSplitInputs(${amt})">
-                    </div>
-                </div>`;
+        window.currentGroup.members.forEach(member => {
+            container.innerHTML += `<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+                <span style="font-size:13px; width:80px;">${member}</span>
+                <div style="display:flex; align-items:center; gap:4px;">
+                    <span style="font-size:13px;">${currentCurrency}</span>
+                    <input type="number" id="input_${member}" value="${equalAmt}"
+                        style="width:70px; padding:8px; border:1px solid #eee; border-radius:8px; text-align:right;"
+                        oninput="validateSplitInputs(${amt})">
+                </div></div>`;
         });
-
     } else if (currentSplitType === 'Share') {
         msg.textContent = 'Assign shares — more shares = more cost';
-        currentGroup.members.forEach(member => {
-            container.innerHTML += `
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-                    <span style="font-size:13px; width:80px;">${member}</span>
-                    <div style="display:flex; align-items:center; gap:4px;">
-                        <input type="number" id="input_${member}" value="1" min="1"
-                            style="width:70px; padding:8px; border:1px solid #eee; border-radius:8px; text-align:right;"
-                            oninput="validateSplitInputs(${amt})">
-                        <span style="font-size:13px;">shares</span>
-                    </div>
-                </div>`;
+        window.currentGroup.members.forEach(member => {
+            container.innerHTML += `<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+                <span style="font-size:13px; width:80px;">${member}</span>
+                <div style="display:flex; align-items:center; gap:4px;">
+                    <input type="number" id="input_${member}" value="1" min="1"
+                        style="width:70px; padding:8px; border:1px solid #eee; border-radius:8px; text-align:right;"
+                        oninput="validateSplitInputs(${amt})">
+                    <span style="font-size:13px;">shares</span>
+                </div></div>`;
         });
     }
 };
 
 window.validateSplitInputs = function (amt) {
     const msg = document.getElementById('splitValidMsg');
-    if (!currentGroup || !msg) return;
-
+    if (!window.currentGroup || !msg) return;
     if (currentSplitType === 'Percentage') {
-        const total = currentGroup.members.reduce((s, m) => {
-            return s + (parseFloat(document.getElementById('input_' + m)?.value) || 0);
-        }, 0);
+        const total = window.currentGroup.members.reduce((s, m) => s + (parseFloat(document.getElementById('input_' + m)?.value) || 0), 0);
         msg.style.color = Math.abs(total - 100) < 1 ? '#5b8f67' : '#d46b82';
-msg.textContent = Math.abs(total - 100) < 1 ? '✓ 100% allocated!' : total.toFixed(1) + '% of 100%';
-
+        msg.textContent = Math.abs(total - 100) < 1 ? '✓ 100% allocated!' : total.toFixed(1) + '% of 100%';
     } else if (currentSplitType === 'Exact') {
-        const total = currentGroup.members.reduce((s, m) => {
-            return s + (parseFloat(document.getElementById('input_' + m)?.value) || 0);
-        }, 0);
+        const total = window.currentGroup.members.reduce((s, m) => s + (parseFloat(document.getElementById('input_' + m)?.value) || 0), 0);
         const diff = (amt - total).toFixed(2);
         msg.style.color = Math.abs(diff) < 0.01 ? '#5b8f67' : '#d46b82';
         msg.textContent = Math.abs(diff) < 0.01 ? '✓ Total matches!' : currentCurrency + diff + ' remaining';
-
     } else if (currentSplitType === 'Share') {
-        const totalShares = currentGroup.members.reduce((s, m) => {
-            return s + (parseFloat(document.getElementById('input_' + m)?.value) || 1);
-        }, 0);
+        const totalShares = window.currentGroup.members.reduce((s, m) => s + (parseFloat(document.getElementById('input_' + m)?.value) || 1), 0);
         msg.style.color = '#5b8f67';
         msg.textContent = 'Total shares: ' + totalShares;
     }
 };
 
-// ============================================================
-//  SECTION 6: EXPENSE MANAGEMENT
-// ============================================================
-window.calculateSplit = function () {
+window.calculateSplit = async function () {
     const amt = parseFloat(document.getElementById('mainAmount').value);
     const name = document.getElementById('expName').value.trim();
     const payer = document.getElementById('payerSelect').value;
-    if (!amt || !name || !currentGroup) { alert("Please enter item name and amount"); return; }
-
+    if (!amt || !name || !window.currentGroup) { alert("Please enter item name and amount"); return; }
     let splits = {};
-
     if (currentSplitType === 'Equal') {
-        const per = amt / currentGroup.members.length;
-        currentGroup.members.forEach(m => splits[m] = per);
-
+        const per = amt / window.currentGroup.members.length;
+        window.currentGroup.members.forEach(m => splits[m] = per);
     } else if (currentSplitType === 'Percentage') {
         let total = 0;
-        currentGroup.members.forEach(m => {
-            const pct = parseFloat(document.getElementById('input_' + m)?.value) || 0;
-            splits[m] = (pct / 100) * amt;
-            total += pct;
-        });
+        window.currentGroup.members.forEach(m => { const pct = parseFloat(document.getElementById('input_' + m)?.value) || 0; splits[m] = (pct / 100) * amt; total += pct; });
         if (Math.abs(total - 100) > 1) { alert("Percentages must add up to 100%"); return; }
     } else if (currentSplitType === 'Exact') {
         let total = 0;
-        currentGroup.members.forEach(m => {
-            splits[m] = parseFloat(document.getElementById('input_' + m)?.value) || 0;
-            total += splits[m];
-        });
+        window.currentGroup.members.forEach(m => { splits[m] = parseFloat(document.getElementById('input_' + m)?.value) || 0; total += splits[m]; });
         if (Math.abs(total - amt) > 0.01) { alert("Amounts don't add up to " + currentCurrency + amt); return; }
-
     } else if (currentSplitType === 'Share') {
         let totalShares = 0;
-        currentGroup.members.forEach(m => {
-            totalShares += parseFloat(document.getElementById('input_' + m)?.value) || 1;
-        });
-        currentGroup.members.forEach(m => {
-            const s = parseFloat(document.getElementById('input_' + m)?.value) || 1;
-            splits[m] = (s / totalShares) * amt;
-        });
+        window.currentGroup.members.forEach(m => { totalShares += parseFloat(document.getElementById('input_' + m)?.value) || 1; });
+        window.currentGroup.members.forEach(m => { const s = parseFloat(document.getElementById('input_' + m)?.value) || 1; splits[m] = (s / totalShares) * amt; });
     }
-
-    currentGroup.expenses.push({ name, amount: amt, payer, splits, splitType: currentSplitType });
+    const category = document.getElementById('categorySelect').value;
+    const date = new Date().toLocaleDateString('en-GB', {day:'numeric', month:'short', year:'numeric'});
+    const expense = { name, amount: amt, payer, splits, splitType: currentSplitType, category, date };
+    window.currentGroup.expenses.push(expense);
+    await window.saveExpense(window.currentGroup.id, expense);
     document.getElementById('expName').value = '';
     document.getElementById('mainAmount').value = '';
     selectSplitType('Equal');
@@ -304,153 +215,142 @@ window.calculateSplit = function () {
     showPage('apartment');
 };
 
-window.settleUp = function (member, amount) {
-    if (!currentGroup.settled) currentGroup.settled = [];
-    currentGroup.settled.push({ member, amount });
+window.settleUp = async function (member, amount) {
+    if (!window.currentGroup.settled) window.currentGroup.settled = [];
+    const settlement = { member, amount };
+    window.currentGroup.settled.push(settlement);
+    await window.saveSettlement(window.currentGroup.id, settlement);
     renderChart();
     renderExpenseLog();
 };
 
-// ============================================================
-//  SECTION 7: CHART & EXPENSE LOG
-// ============================================================
 window.renderChart = function () {
-    const chart = document.getElementById('chartMembers');
-    chart.innerHTML = '';
-    const members = currentGroup.members;
-    const owedMap = {};
-    members.forEach(m => owedMap[m.trim()] = 0);
-
-    (currentGroup.expenses || []).forEach(exp => {
-        if (exp.splits) {
-            members.forEach(m => {
-                if (m !== exp.payer) owedMap[m.trim()] += exp.splits[m] || 0;
-            });
-        } else {
-            const perPerson = exp.amount / members.length;
-            members.forEach(m => { if (m.trim() !== exp.payer) owedMap[m.trim()] += perPerson; });
+    try {
+        if (!window.currentGroup) return;
+        const categoryTotals = {};
+        (window.currentGroup.expenses || []).forEach(exp => {
+            const cat = exp.category || '🧾 Other';
+            categoryTotals[cat] = (categoryTotals[cat] || 0) + exp.amount;
+        });
+        const labels = Object.keys(categoryTotals);
+        const values = Object.values(categoryTotals);
+        const colors = ['#2d8cff','#5b8f67','#d46b82','#f7c948','#a855f7','#f97316'];
+        if (window._pieChart) window._pieChart.destroy();
+        if (labels.length === 0) {
+            document.getElementById('chartMembers').innerHTML = '<p style="color:#aaa; font-size:13px; text-align:center;">No expenses yet</p>';
+            return;
         }
-    });
-
-    (currentGroup.settled || []).forEach(s => {
-        owedMap[s.member] = Math.max(0, (owedMap[s.member] || 0) - s.amount);
-    });
-
-    const maxOwed = Math.max(...Object.values(owedMap), 1);
-    members.forEach(member => {
-        const owed = owedMap[member.trim()];
-        const barHeight = Math.max(20, (owed / maxOwed) * 110);
-        const label = owed > 0 ? currentCurrency + Math.round(owed) : '';
-        chart.innerHTML += `
-            <div class="bar-wrapper">
-                <div class="bar" style="height:${barHeight}px; color:#333;">
-                    <span>${label}</span>
-                    ${owed <= 0 ? '<div style="font-size:14px;">✓</div>' : ''}
-                </div>
-                <strong>${member.trim()}</strong>
+        const ctx = document.getElementById('pieChart').getContext('2d');
+        window._pieChart = new Chart(ctx, {
+            type: 'doughnut',
+            data: { labels, datasets: [{ data: values, backgroundColor: colors.slice(0, labels.length), borderWidth: 2, borderColor: '#fff' }] },
+            options: { responsive: true, plugins: { legend: { position: 'bottom', labels: { font: { size: 11 } } } } }
+        });
+        const chart = document.getElementById('chartMembers');
+        chart.innerHTML = '';
+        const members = window.currentGroup.members;
+        const owedMap = {};
+        members.forEach(m => owedMap[m.trim()] = 0);
+        (window.currentGroup.expenses || []).forEach(exp => {
+            members.forEach(m => {
+                if (m !== exp.payer) { const amt = exp.splits ? exp.splits[m] : (exp.amount / members.length); owedMap[m.trim()] += amt || 0; }
+            });
+        });
+        (window.currentGroup.settled || []).forEach(s => { owedMap[s.member] = Math.max(0, (owedMap[s.member] || 0) - s.amount); });
+        members.forEach(member => {
+            const owed = owedMap[member.trim()];
+            chart.innerHTML += `<div style="text-align:center; font-size:12px;">
+                <div style="font-weight:bold; color:#333;">${member.trim()}</div>
+                <div style="color:${owed > 0 ? '#d46b82' : '#5b8f67'};">${owed > 0 ? currentCurrency + owed.toFixed(0) : '✓'}</div>
             </div>`;
-    });
+        });
+    } catch(err) { console.error('Chart error:', err); }
 };
 
 window.renderExpenseLog = function () {
+    if (!window.currentGroup) return;
     const resultBox = document.getElementById('resultContainer');
     resultBox.innerHTML = '';
-    const t = translations[currentLang];
-
-    if (currentGroup.expenses.length === 0) {
-        resultBox.innerHTML = `<div style="text-align:center; color:#aaa; padding:20px;">
-            <div style="font-size:30px;">🧾</div>
-            <p><b>${t.noExpenses}</b></p>
-            <p style="font-size:12px;">${t.tapToAdd}</p>
+    const totalSpend = (window.currentGroup.expenses || []).reduce((s,e) => s + e.amount, 0);
+    const myShare = totalSpend / window.currentGroup.members.length;
+    resultBox.innerHTML += `
+        <div style="background:linear-gradient(135deg,#2d8cff,#5b8f67); color:white; padding:14px; border-radius:14px; margin-bottom:12px;">
+            <div style="display:flex; justify-content:space-between;">
+                <div><div style="font-size:11px; opacity:0.8;">Total Spent</div>
+                <div style="font-size:20px; font-weight:bold;">${currentCurrency}${totalSpend.toFixed(2)}</div></div>
+                <div style="text-align:right;"><div style="font-size:11px; opacity:0.8;">Per Person</div>
+                <div style="font-size:20px; font-weight:bold;">${currentCurrency}${myShare.toFixed(2)}</div></div>
+            </div>
         </div>`;
+    const t = translations[currentLang];
+    if ((window.currentGroup.expenses || []).length === 0) {
+        resultBox.innerHTML += `<div style="text-align:center; color:#aaa; padding:20px;">
+            <div style="font-size:30px;">🧾</div><p><b>${t.noExpenses}</b></p>
+            <p style="font-size:12px;">${t.tapToAdd}</p></div>`;
         return;
     }
-
     resultBox.innerHTML += `<p style="font-weight:bold; color:#555; font-size:13px; margin:10px 0 8px;">${t.expenseHistory}</p>`;
-
-    [...currentGroup.expenses].reverse().forEach(exp => {
-        const splits = currentGroup.members.map(m => {
-            const amt = exp.splits ? exp.splits[m] : (exp.amount / currentGroup.members.length);
-            if (m === exp.payer) {
-                return `<span style="font-size:10px; background:#e6f4ea; color:#5b8f67; padding:2px 6px; border-radius:20px;">${m} ${t.paid}</span>`;
-            }
+    [...window.currentGroup.expenses].reverse().forEach(exp => {
+        const splits = window.currentGroup.members.map(m => {
+            const amt = exp.splits ? exp.splits[m] : (exp.amount / window.currentGroup.members.length);
+            if (m === exp.payer) return `<span style="font-size:10px; background:#e6f4ea; color:#5b8f67; padding:2px 6px; border-radius:20px;">${m} ${t.paid}</span>`;
             return `<span style="font-size:10px; background:#fde8ee; color:#d46b82; padding:2px 6px; border-radius:20px;">${m} ${t.owes} ${currentCurrency}${amt ? amt.toFixed(2) : '0.00'}</span>`;
         }).join(' ');
-
-        const splitLabel = exp.splitType && exp.splitType !== 'Equal' ? `<span style="font-size:10px; background:#eef; color:#2d8cff; padding:2px 6px; border-radius:20px; margin-left:4px;">${exp.splitType}</span>` : '';
-
+        const splitLabel = exp.splitType && exp.splitType !== 'Equal'
+            ? `<span style="font-size:10px; background:#eef; color:#2d8cff; padding:2px 6px; border-radius:20px; margin-left:4px;">${exp.splitType}</span>` : '';
+        const expIndex = window.currentGroup.expenses.indexOf(exp);
         resultBox.innerHTML += `
-            <div style="background:white; padding:12px; border-radius:12px; margin-bottom:8px; box-shadow:0 2px 6px rgba(0,0,0,0.05);">
-                <div style="display:flex; justify-content:space-between; font-size:13px; font-weight:bold;">
-                    <span>${exp.name} ${splitLabel}</span><span>${currentCurrency}${exp.amount}</span>
+            <div class="expense-item-card" style="background:white; padding:12px; border-radius:12px; margin-bottom:8px; box-shadow:0 2px 6px rgba(0,0,0,0.05);">
+                <div style="display:flex; justify-content:space-between; font-size:13px; font-weight:bold; color:#333; align-items:center;">
+                    <span>${exp.category || ''} ${exp.name} ${splitLabel}</span>
+                    <div style="display:flex; align-items:center; gap:6px;">
+                        <span style="font-size:10px; color:#aaa; font-weight:normal;">${exp.date || ''}</span>
+                        <span>${currentCurrency}${exp.amount}</span>
+                        <button onclick="window.editExpensePrompt(${expIndex})" style="background:none; border:none; color:#2d8cff; font-size:14px; cursor:pointer; padding:0;">✏️</button>
+                        <button onclick="confirmDeleteExpense(${expIndex})" style="background:none; border:none; color:#d46b82; font-size:14px; cursor:pointer; padding:0;">🗑️</button>
+                    </div>
                 </div>
                 <div style="margin-top:5px;">${splits}</div>
             </div>`;
     });
-
     resultBox.innerHTML += `<p style="font-weight:bold; color:#555; font-size:13px; margin:15px 0 8px;">${t.settleUp}</p>`;
-
     const owedMap = {};
-    currentGroup.members.forEach(m => owedMap[m] = 0);
-    currentGroup.expenses.forEach(exp => {
-        currentGroup.members.forEach(m => {
-            if (m !== exp.payer) {
-                const amt = exp.splits ? exp.splits[m] : (exp.amount / currentGroup.members.length);
-                owedMap[m] += amt || 0;
-            }
+    window.currentGroup.members.forEach(m => owedMap[m] = 0);
+    (window.currentGroup.expenses || []).forEach(exp => {
+        window.currentGroup.members.forEach(m => {
+            if (m !== exp.payer) { const amt = exp.splits ? exp.splits[m] : (exp.amount / window.currentGroup.members.length); owedMap[m] += amt || 0; }
         });
     });
-    (currentGroup.settled || []).forEach(s => {
-        owedMap[s.member] = Math.max(0, owedMap[s.member] - s.amount);
-    });
-
+    (window.currentGroup.settled || []).forEach(s => { owedMap[s.member] = Math.max(0, owedMap[s.member] - s.amount); });
     let anyUnsettled = false;
-    currentGroup.members.forEach(member => {
+    window.currentGroup.members.forEach(member => {
         const owed = owedMap[member];
         if (owed > 0.01) {
             anyUnsettled = true;
             resultBox.innerHTML += `
                 <div style="background:white; padding:12px; border-radius:12px; margin-bottom:8px; display:flex; justify-content:space-between; align-items:center; box-shadow:0 2px 6px rgba(0,0,0,0.05);">
-                    <div>
-                        <span style="font-size:13px;">${member}</span><br>
-                        <span style="color:#d46b82; font-size:12px;">${t.owes} ${currentCurrency}${owed.toFixed(2)}</span>
-                    </div>
+                    <div><span style="font-size:13px; color:#333;">${member.trim()}</span><br>
+                    <span style="color:#d46b82; font-size:12px;">${t.owes} ${currentCurrency}${owed.toFixed(2)}</span></div>
                     <button onclick="settleUp('${member}', ${owed})"
-                        style="background:#5b8f67; color:white; border:none; padding:8px 12px; border-radius:10px; font-size:12px; cursor:pointer;">
-                        ${t.settle}
-                    </button>
+                        style="background:#5b8f67; color:white; border:none; padding:8px 12px; border-radius:10px; font-size:12px; cursor:pointer;">${t.settle}</button>
                 </div>`;
         }
     });
-
     if (!anyUnsettled) {
         resultBox.innerHTML += `<div style="text-align:center; color:#5b8f67; padding:15px; background:white; border-radius:12px;">🎉 <b>${t.allSettled}</b></div>`;
+        launchConfetti();
     }
 };
 
-// ============================================================
-//  SECTION 8: THEME
-// ============================================================
 window.setTheme = function (mode) {
     const phone = document.querySelector('.phone');
     const sidebar = document.querySelector('.sidebar');
-    if (mode === 'dark') {
-        phone.style.background = '#1a1a1a';
-        phone.style.color = 'white';
-        sidebar.style.background = '#2d2d2d';
-        sidebar.style.color = 'white';
-    } else {
-        phone.style.background = '';
-        phone.style.color = '';
-        sidebar.style.background = '';
-        sidebar.style.color = '';
-    }
+    if (mode === 'dark') { phone.style.background = '#1a1a1a'; phone.style.color = 'white'; sidebar.style.background = '#2d2d2d'; sidebar.style.color = 'white'; }
+    else { phone.style.background = ''; phone.style.color = ''; sidebar.style.background = ''; sidebar.style.color = ''; }
+    renderDashboard();
     toggleMenu();
 };
 
-// ============================================================
-//  SECTION 9: LANGUAGE
-// ============================================================
 const translations = {
     english: {
         hello: "Hello, User 👋", welcome: "Welcome to Equapay", getStarted: "Get Started",
@@ -568,75 +468,143 @@ window.applyLanguage = function (lang) {
     document.getElementById('sidebarLogout').textContent = t.logout;
     document.querySelector('#noGroupsMsg p b').textContent = t.noGroups;
     document.querySelector('#noGroupsMsg .hint').textContent = t.tapToCreate;
+    const splitLabels = {
+        english: ['⚖️ Equal', '📊 Percent', '✏️ Exact', '🔢 Shares'],
+        hindi: ['⚖️ बराबर', '📊 प्रतिशत', '✏️ सटीक', '🔢 हिस्से'],
+        telugu: ['⚖️ సమాన', '📊 శాతం', '✏️ ఖచ్చితం', '🔢 వాటాలు'],
+        urdu: ['⚖️ برابر', '📊 فیصد', '✏️ عین', '🔢 حصے']
+    };
+    const labels = splitLabels[lang] || splitLabels['english'];
+    ['Equal', 'Percentage', 'Exact', 'Share'].forEach((type, i) => {
+        const btn = document.getElementById('splitBtn' + type);
+        if (btn) btn.textContent = labels[i];
+    });
+    if (document.getElementById('splitTypeLabel')) {
+        const splitTypeNames = { english: 'Split Type', hindi: 'विभाजन प्रकार', telugu: 'విభజన రకం', urdu: 'تقسیم کی قسم' };
+        document.getElementById('splitTypeLabel').textContent = splitTypeNames[lang] || 'Split Type';
+    }
+    const currencyLabels = { english: 'Currency', hindi: 'मुद्रा', telugu: 'కరెన్సీ', urdu: 'کرنسی' };
+    const splitLabels2 = { english: 'Split type', hindi: 'विभाजन', telugu: 'విభజన', urdu: 'تقسیم' };
+    document.querySelector('#currencySelect').previousElementSibling.textContent = currencyLabels[lang] || 'Currency';
+    document.querySelector('#splitSelect').previousElementSibling.textContent = splitLabels2[lang] || 'Split type';
+    const splitOptions = {
+        english: ['Equal', 'Percentage', 'Exact Amount', 'By Shares'],
+        hindi: ['बराबर', 'प्रतिशत', 'सटीक राशि', 'हिस्सों से'],
+        telugu: ['సమాన', 'శాతం', 'ఖచ్చిత మొత్తం', 'వాటాల ద్వారా'],
+        urdu: ['برابر', 'فیصد', 'عین رقم', 'حصوں سے']
+    };
+    const opts = splitOptions[lang] || splitOptions['english'];
+    ['Equal', 'Percentage', 'Exact', 'Share'].forEach((id, i) => { const el = document.getElementById('opt' + id); if (el) el.textContent = opts[i]; });
     showLanguagePicker(false);
     renderDashboard();
-    if (currentGroup) { renderChart(); renderExpenseLog(); }
-    const splitLabels = {
-    english: ['⚖️ Equal', '📊 Percent', '✏️ Exact', '🔢 Shares'],
-    hindi: ['⚖️ बराबर', '📊 प्रतिशत', '✏️ सटीक', '🔢 हिस्से'],
-    telugu: ['⚖️ సమాన', '📊 శాతం', '✏️ ఖచ్చితం', '🔢 వాటాలు'],
-    urdu: ['⚖️ برابر', '📊 فیصد', '✏️ عین', '🔢 حصے']
-};
-const labels = splitLabels[lang] || splitLabels['english'];
-['Equal','Percentage','Exact','Share'].forEach((type, i) => {
-    const btn = document.getElementById('splitBtn' + type);
-    if (btn) btn.textContent = labels[i];
-    // Translate Split Type label in addExpense
-if (document.getElementById('splitTypeLabel')) {
-    const splitTypeNames = {
-        english: 'Split Type', hindi: 'विभाजन प्रकार',
-        telugu: 'విభజన రకం', urdu: 'تقسیم کی قسم'
-    };
-    document.getElementById('splitTypeLabel').textContent = splitTypeNames[lang] || 'Split Type';
-}
-
-// Translate Currency and Split type labels in sidebar
-const currencyLabels = { english: 'Currency', hindi: 'मुद्रा', telugu: 'కరెన్సీ', urdu: 'کرنسی' };
-const splitLabels2 = { english: 'Split type', hindi: 'विभाजन', telugu: 'విభజన', urdu: 'تقسیم' };
-document.querySelector('#currencySelect').previousElementSibling.textContent = currencyLabels[lang] || 'Currency';
-document.querySelector('#splitSelect').previousElementSibling.textContent = splitLabels2[lang] || 'Split type';
-// Split dropdown options
-const splitOptions = {
-    english: ['Equal', 'Percentage', 'Exact Amount', 'By Shares'],
-    hindi: ['बराबर', 'प्रतिशत', 'सटीक राशि', 'हिस्सों से'],
-    telugu: ['సమాన', 'శాతం', 'ఖచ్చిత మొత్తం', 'వాటాల ద్వారా'],
-    urdu: ['برابر', 'فیصد', 'عین رقم', 'حصوں سے']
-};
-const opts = splitOptions[lang] || splitOptions['english'];
-['Equal','Percentage','Exact','Share'].forEach((id, i) => {
-    const el = document.getElementById('opt' + id);
-    if (el) el.textContent = opts[i];
-});
-});
+    if (window.currentGroup) { renderChart(); renderExpenseLog(); }
 };
 
-// ============================================================
-//  SECTION 10: UI HELPERS
-// ============================================================
 window.toggleNotifications = function () {
     const span = document.querySelector('#sidebarNotif span');
-    span.textContent = span.textContent === 'ON' ? 'OFF' : 'ON';
+    notificationsEnabled = !notificationsEnabled;
+    span.textContent = notificationsEnabled ? 'ON' : 'OFF';
+    if (notificationsEnabled) {
+        Notification.requestPermission().then(perm => {
+            if (perm === 'granted') {
+                new Notification('Equapay Notifications ON', {
+                    body: 'You will be reminded when members owe money.',
+                    icon: 'logo.png'
+                });
+            }
+        });
+    }
 };
 
-window.showLanguagePicker = function (show) {
-    document.getElementById('languagePicker').style.display = show ? 'block' : 'none';
-};
-
-window.changeCurrency = function (symbol) {
-    currentCurrency = symbol;
-    renderDashboard();
-    if (currentGroup) { renderChart(); renderExpenseLog(); }
-};
-
-window.changeSplit = function (type) {
-    currentSplitType = type;
-};
-// Search functionality
-document.querySelector('.search-bar').oninput = function() {
-    const query = this.value.toLowerCase();
-    const cards = list.querySelectorAll('.expense-card');
-    cards.forEach(card => {
-        const name = card.querySelector('strong').textContent.toLowerCase();
-        card.style.display = name.includes(query) ? 'flex' : 'none';
+window.notifyOwed = function () {
+    if (!notificationsEnabled) { alert('Turn on notifications in settings first!'); return; }
+    if (!window.currentGroup) { alert('Open a group first!'); return; }
+    const owedMap = {};
+    window.currentGroup.members.forEach(m => owedMap[m] = 0);
+    (window.currentGroup.expenses || []).forEach(exp => {
+        window.currentGroup.members.forEach(m => {
+            if (m !== exp.payer) { const amt = exp.splits ? exp.splits[m] : (exp.amount / window.currentGroup.members.length); owedMap[m] += amt || 0; }
+        });
     });
+    (window.currentGroup.settled || []).forEach(s => { owedMap[s.member] = Math.max(0, owedMap[s.member] - s.amount); });
+    const debtors = Object.entries(owedMap).filter(([m, amt]) => amt > 0.01);
+    if (debtors.length === 0) { alert('Everyone is settled up! 🎉'); return; }
+    if (Notification.permission === 'granted') {
+        debtors.forEach(([member, amt]) => {
+            new Notification(`💸 ${member} owes money!`, {
+                body: `${member} owes ${currentCurrency}${amt.toFixed(2)} in ${window.currentGroup.name}`,
+                icon: 'logo.png'
+            });
+        });
+    } else {
+        Notification.requestPermission().then(perm => {
+            if (perm === 'granted') notifyOwed();
+            else alert(debtors.map(([m, a]) => `${m} owes ${currentCurrency}${a.toFixed(2)}`).join('\n'));
+        });
+    }
+};
+
+window.showLanguagePicker = function (show) { document.getElementById('languagePicker').style.display = show ? 'block' : 'none'; };
+window.changeCurrency = function (symbol) { currentCurrency = symbol; renderDashboard(); if (window.currentGroup) { renderChart(); renderExpenseLog(); } };
+window.changeSplit = function (type) { currentSplitType = type; };
+
+window.confirmDeleteExpense = function(index) {
+    if (confirm('Delete this expense?')) window.deleteExpense(window.currentGroup.id, index);
+};
+window.editExpensePrompt = function(index) {
+    const exp = window.currentGroup.expenses[index];
+    const newName = prompt('Expense name:', exp.name);
+    if (!newName) return;
+    const newAmt = parseFloat(prompt('Amount:', exp.amount));
+    if (!newAmt) return;
+    const updated = { ...exp, name: newName, amount: newAmt };
+    window.editExpense(window.currentGroup.id, index, updated);
+};
+window.shareExpenseSummary = function () {
+    if (!window.currentGroup) return;
+    const lines = [`📋 ${window.currentGroup.name} — Expense Summary\n`];
+    (window.currentGroup.expenses || []).forEach(exp => { lines.push(`• ${exp.name}: ${currentCurrency}${exp.amount} (paid by ${exp.payer})`); });
+    const total = (window.currentGroup.expenses || []).reduce((s, e) => s + e.amount, 0);
+    lines.push(`\nTotal: ${currentCurrency}${total.toFixed(2)}`);
+    const text = lines.join('\n');
+    if (navigator.share) navigator.share({ title: window.currentGroup.name, text });
+    else navigator.clipboard.writeText(text).then(() => alert('Summary copied to clipboard!'));
+};
+window.confirmDeleteGroup = function () {
+    if (confirm('Delete this entire group? This cannot be undone.')) window.deleteGroup(window.currentGroup.id);
+};
+window.showEditMembers = function () {
+    const panel = document.getElementById('editMembersPanel');
+    document.getElementById('editMembersInput').value = window.currentGroup.members.join(', ');
+    panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
+};
+window.saveEditedMembers = function () {
+    const input = document.getElementById('editMembersInput').value.trim();
+    if (!input) { alert('Please enter at least one member'); return; }
+    const newMembers = input.split(',').map(m => m.trim()).filter(Boolean);
+    window.updateGroupMembers(window.currentGroup.id, newMembers);
+    document.getElementById('editMembersPanel').style.display = 'none';
+};
+window.selectCategory = function(btn, value) {
+    document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('categorySelect').value = value;
+};
+window.showLoading = function() { const s = document.getElementById('loadingSpinner'); if(s) s.style.display = 'block'; };
+window.hideLoading = function() { const s = document.getElementById('loadingSpinner'); if(s) s.style.display = 'none'; };
+window.launchConfetti = function() {
+    const colors = ['#2d8cff','#5b8f67','#d46b82','#f7c948','#a855f7'];
+    for (let i = 0; i < 60; i++) {
+        const dot = document.createElement('div');
+        dot.style.cssText = `position:fixed; width:8px; height:8px; border-radius:50%;
+            background:${colors[Math.floor(Math.random()*colors.length)]};
+            left:${Math.random()*100}vw; top:-10px;
+            animation: fall ${1.5 + Math.random()}s linear forwards; z-index:9999;`;
+        document.body.appendChild(dot);
+        setTimeout(() => dot.remove(), 2500);
+    }
+};
+window.filterExpenses = function(query) {
+    const cards = document.querySelectorAll('.expense-item-card');
+    cards.forEach(card => { card.style.display = card.textContent.toLowerCase().includes(query.toLowerCase()) ? 'block' : 'none'; });
 };
