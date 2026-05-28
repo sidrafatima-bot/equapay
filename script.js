@@ -5,6 +5,9 @@ let currentSplitType = 'Equal';
 let currentLang = 'english';
 let notificationsEnabled = true;
 
+// CHANGE 3: Notification log storage
+window.notificationLog = [];
+
 window.showPage = function (id) {
     document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
     document.getElementById(id).classList.add('active');
@@ -111,6 +114,17 @@ window.selectSplitType = function (type) {
     if (customDiv) { customDiv.style.display = type === 'Equal' ? 'none' : 'block'; updateSplitFields(); }
 };
 
+// CHANGE 4: Payment method selector
+window.selectPaymentMethod = function(method) {
+    document.getElementById('paymentMethodSelect').value = method;
+    ['UPI', 'Cash', 'Card'].forEach(m => {
+        const btn = document.getElementById('pm' + m);
+        if (!btn) return;
+        if (m === method) { btn.classList.add('active-pay'); }
+        else { btn.classList.remove('active-pay'); }
+    });
+};
+
 window.updateSplitFields = function () {
     if (!window.currentGroup) return;
     const amt = parseFloat(document.getElementById('mainAmount').value) || 0;
@@ -183,6 +197,8 @@ window.calculateSplit = async function () {
     const amt = parseFloat(document.getElementById('mainAmount').value);
     const name = document.getElementById('expName').value.trim();
     const payer = document.getElementById('payerSelect').value;
+    // CHANGE 4: Read payment method
+    const paymentMethod = document.getElementById('paymentMethodSelect').value || 'UPI';
     if (!amt || !name || !window.currentGroup) { alert("Please enter item name and amount"); return; }
     let splits = {};
     if (currentSplitType === 'Equal') {
@@ -203,7 +219,8 @@ window.calculateSplit = async function () {
     }
     const category = document.getElementById('categorySelect').value;
     const date = new Date().toLocaleDateString('en-GB', {day:'numeric', month:'short', year:'numeric'});
-    const expense = { name, amount: amt, payer, splits, splitType: currentSplitType, category, date };
+    // CHANGE 4: Save paymentMethod in expense object
+    const expense = { name, amount: amt, payer, splits, splitType: currentSplitType, category, date, paymentMethod };
     window.currentGroup.expenses.push(expense);
     await window.saveExpense(window.currentGroup.id, expense);
     document.getElementById('expName').value = '';
@@ -298,11 +315,19 @@ window.renderExpenseLog = function () {
         }).join(' ');
         const splitLabel = exp.splitType && exp.splitType !== 'Equal'
             ? `<span style="font-size:10px; background:#eef; color:#2d8cff; padding:2px 6px; border-radius:20px; margin-left:4px;">${exp.splitType}</span>` : '';
+
+        // CHANGE 4: Payment method badge
+        const pmIcons = { UPI: '📱', Cash: '💵', Card: '💳' };
+        const pmColors = { UPI: '#f0f7ff', Cash: '#f0fff4', Card: '#fff0f6' };
+        const pmTextColors = { UPI: '#2d8cff', Cash: '#5b8f67', Card: '#d46b82' };
+        const pm = exp.paymentMethod || 'UPI';
+        const pmBadge = `<span style="font-size:10px; background:${pmColors[pm] || '#f0f7ff'}; color:${pmTextColors[pm] || '#2d8cff'}; padding:2px 6px; border-radius:20px; margin-left:4px;">${pmIcons[pm] || '📱'} ${pm}</span>`;
+
         const expIndex = window.currentGroup.expenses.indexOf(exp);
         resultBox.innerHTML += `
             <div class="expense-item-card" style="background:white; padding:12px; border-radius:12px; margin-bottom:8px; box-shadow:0 2px 6px rgba(0,0,0,0.05);">
                 <div style="display:flex; justify-content:space-between; font-size:13px; font-weight:bold; color:#333; align-items:center;">
-                    <span>${exp.category || ''} ${exp.name} ${splitLabel}</span>
+                    <span>${exp.category || ''} ${exp.name} ${splitLabel}${pmBadge}</span>
                     <div style="display:flex; align-items:center; gap:6px;">
                         <span style="font-size:10px; color:#aaa; font-weight:normal;">${exp.date || ''}</span>
                         <span>${currentCurrency}${exp.amount}</span>
@@ -313,6 +338,33 @@ window.renderExpenseLog = function () {
                 <div style="margin-top:5px;">${splits}</div>
             </div>`;
     });
+
+    // CHANGE 4: Payment method summary section
+    const pmTotals = { UPI: 0, Cash: 0, Card: 0 };
+    (window.currentGroup.expenses || []).forEach(exp => {
+        const pm = exp.paymentMethod || 'UPI';
+        if (pmTotals[pm] !== undefined) pmTotals[pm] += exp.amount;
+    });
+    const hasPmData = Object.values(pmTotals).some(v => v > 0);
+    if (hasPmData) {
+        resultBox.innerHTML += `
+            <p style="font-weight:bold; color:#555; font-size:13px; margin:15px 0 8px;">💳 Payment Breakdown</p>
+            <div style="background:white; padding:12px; border-radius:12px; margin-bottom:12px; box-shadow:0 2px 6px rgba(0,0,0,0.05);">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+                    <span style="font-size:13px;">📱 UPI</span>
+                    <span style="font-weight:bold; color:#2d8cff;">${currentCurrency}${pmTotals.UPI.toFixed(2)}</span>
+                </div>
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+                    <span style="font-size:13px;">💵 Cash</span>
+                    <span style="font-weight:bold; color:#5b8f67;">${currentCurrency}${pmTotals.Cash.toFixed(2)}</span>
+                </div>
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <span style="font-size:13px;">💳 Card</span>
+                    <span style="font-weight:bold; color:#d46b82;">${currentCurrency}${pmTotals.Card.toFixed(2)}</span>
+                </div>
+            </div>`;
+    }
+
     resultBox.innerHTML += `<p style="font-weight:bold; color:#555; font-size:13px; margin:15px 0 8px;">${t.settleUp}</p>`;
     const owedMap = {};
     window.currentGroup.members.forEach(m => owedMap[m] = 0);
@@ -516,6 +568,28 @@ window.toggleNotifications = function () {
     }
 };
 
+// CHANGE 3: Render notification log panel
+window.renderNotifLog = function() {
+    const panel = document.getElementById('notifLogPanel');
+    const list = document.getElementById('notifLogList');
+    if (!panel || !list) return;
+    if (window.notificationLog.length === 0) {
+        list.innerHTML = '<p style="color:#aaa; font-size:12px; text-align:center; margin:0;">No reminders sent yet</p>';
+    } else {
+        list.innerHTML = window.notificationLog.slice().reverse().map(n =>
+            `<div class="notif-log-item">
+                <span style="font-size:16px;">🔔</span>
+                <div style="flex:1;">
+                    <div style="font-weight:bold; color:#333;">${n.member}</div>
+                    <div>${n.message}</div>
+                </div>
+                <div class="notif-log-time">${n.time}</div>
+            </div>`
+        ).join('');
+    }
+    panel.style.display = 'block';
+};
+
 window.notifyOwed = function () {
     if (!notificationsEnabled) { alert('Turn on notifications in settings first!'); return; }
     if (!window.currentGroup) { alert('Open a group first!'); return; }
@@ -529,6 +603,17 @@ window.notifyOwed = function () {
     (window.currentGroup.settled || []).forEach(s => { owedMap[s.member] = Math.max(0, owedMap[s.member] - s.amount); });
     const debtors = Object.entries(owedMap).filter(([m, amt]) => amt > 0.01);
     if (debtors.length === 0) { alert('Everyone is settled up! 🎉'); return; }
+
+    // CHANGE 3: Log notifications in-app
+    const now = new Date();
+    const timeStr = now.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
+    debtors.forEach(([member, amt]) => {
+        const message = `${member} owes ${currentCurrency}${amt.toFixed(2)} in ${window.currentGroup.name}`;
+        window.notificationLog.push({ member, message, time: timeStr });
+    });
+    // Show notification log panel
+    window.renderNotifLog();
+
     if (Notification.permission === 'granted') {
         debtors.forEach(([member, amt]) => {
             new Notification(`💸 ${member} owes money!`, {
@@ -538,8 +623,16 @@ window.notifyOwed = function () {
         });
     } else {
         Notification.requestPermission().then(perm => {
-            if (perm === 'granted') notifyOwed();
-            else alert(debtors.map(([m, a]) => `${m} owes ${currentCurrency}${a.toFixed(2)}`).join('\n'));
+            if (perm === 'granted') {
+                debtors.forEach(([member, amt]) => {
+                    new Notification(`💸 ${member} owes money!`, {
+                        body: `${member} owes ${currentCurrency}${amt.toFixed(2)} in ${window.currentGroup.name}`,
+                        icon: 'logo.png'
+                    });
+                });
+            } else {
+                alert(debtors.map(([m, a]) => `${m} owes ${currentCurrency}${a.toFixed(2)}`).join('\n'));
+            }
         });
     }
 };
@@ -563,7 +656,7 @@ window.editExpensePrompt = function(index) {
 window.shareExpenseSummary = function () {
     if (!window.currentGroup) return;
     const lines = [`📋 ${window.currentGroup.name} — Expense Summary\n`];
-    (window.currentGroup.expenses || []).forEach(exp => { lines.push(`• ${exp.name}: ${currentCurrency}${exp.amount} (paid by ${exp.payer})`); });
+    (window.currentGroup.expenses || []).forEach(exp => { lines.push(`• ${exp.name}: ${currentCurrency}${exp.amount} (paid by ${exp.payer} via ${exp.paymentMethod || 'UPI'})`); });
     const total = (window.currentGroup.expenses || []).reduce((s, e) => s + e.amount, 0);
     lines.push(`\nTotal: ${currentCurrency}${total.toFixed(2)}`);
     const text = lines.join('\n');
@@ -573,18 +666,108 @@ window.shareExpenseSummary = function () {
 window.confirmDeleteGroup = function () {
     if (confirm('Delete this entire group? This cannot be undone.')) window.deleteGroup(window.currentGroup.id);
 };
+
+// CHANGE 2: showEditMembers - show current members as chips, username input
 window.showEditMembers = function () {
     const panel = document.getElementById('editMembersPanel');
-    document.getElementById('editMembersInput').value = window.currentGroup.members.join(', ');
     panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
+    if (panel.style.display === 'block') {
+        window._editingMembers = [...window.currentGroup.members];
+        renderMemberChips();
+        document.getElementById('editUsernameInput').value = '';
+        document.getElementById('usernameLookupResult').textContent = '';
+    }
 };
+
+// CHANGE 2: Render member chips with remove button
+window.renderMemberChips = function() {
+    const container = document.getElementById('currentMembersList');
+    if (!container) return;
+    container.innerHTML = window._editingMembers.map((m, i) =>
+        `<div class="member-tag">
+            ${m}
+            <button onclick="window.removeMemberChip(${i})" title="Remove">✕</button>
+        </div>`
+    ).join('');
+};
+
+window.removeMemberChip = function(index) {
+    window._editingMembers.splice(index, 1);
+    renderMemberChips();
+};
+
+// CHANGE 2: Username lookup - searches registered users in Firestore
+window.lookupUsername = function(val) {
+    const result = document.getElementById('usernameLookupResult');
+    const username = val.trim().replace(/^@/, '').toLowerCase();
+    if (!username || username.length < 2) { result.textContent = ''; return; }
+    result.style.color = '#aaa';
+    result.textContent = '🔍 Looking up...';
+    // Lookup from Firestore users collection
+    if (window.lookupUserByUsername) {
+        window.lookupUserByUsername(username).then(user => {
+            if (user) {
+                result.style.color = '#5b8f67';
+                result.textContent = `✓ Found: ${user.name} (@${user.username})`;
+                window._lookedUpUser = user;
+            } else {
+                result.style.color = '#d46b82';
+                result.textContent = `✗ Username @${username} not found`;
+                window._lookedUpUser = null;
+            }
+        });
+    } else {
+        result.style.color = '#aaa';
+        result.textContent = 'Lookup not available yet';
+        window._lookedUpUser = null;
+    }
+};
+
+// CHANGE 2: Add member from username lookup result
+window.addMemberFromUsername = function() {
+    const input = document.getElementById('editUsernameInput').value.trim().replace(/^@/, '');
+    const result = document.getElementById('usernameLookupResult');
+    if (!input) { result.style.color = '#d46b82'; result.textContent = 'Enter a username first'; return; }
+    if (window._lookedUpUser && window._lookedUpUser.username.toLowerCase() === input.toLowerCase()) {
+        const name = window._lookedUpUser.name;
+        if (!window._editingMembers.includes(name)) {
+            window._editingMembers.push(name);
+            renderMemberChips();
+            result.style.color = '#5b8f67';
+            result.textContent = `✓ Added ${name}`;
+            document.getElementById('editUsernameInput').value = '';
+            window._lookedUpUser = null;
+        } else {
+            result.style.color = '#d46b82';
+            result.textContent = `${name} is already in the group`;
+        }
+    } else {
+        // Fallback: add the raw input as a name if no lookup result
+        const name = input;
+        if (name && !window._editingMembers.includes(name)) {
+            window._editingMembers.push(name);
+            renderMemberChips();
+            result.style.color = '#5b8f67';
+            result.textContent = `✓ Added ${name}`;
+            document.getElementById('editUsernameInput').value = '';
+        } else if (window._editingMembers.includes(name)) {
+            result.style.color = '#d46b82';
+            result.textContent = `${name} is already in the group`;
+        } else {
+            result.style.color = '#d46b82';
+            result.textContent = 'Search for a username first';
+        }
+    }
+};
+
 window.saveEditedMembers = function () {
-    const input = document.getElementById('editMembersInput').value.trim();
-    if (!input) { alert('Please enter at least one member'); return; }
-    const newMembers = input.split(',').map(m => m.trim()).filter(Boolean);
-    window.updateGroupMembers(window.currentGroup.id, newMembers);
+    if (!window._editingMembers || window._editingMembers.length === 0) {
+        alert('Please add at least one member'); return;
+    }
+    window.updateGroupMembers(window.currentGroup.id, window._editingMembers);
     document.getElementById('editMembersPanel').style.display = 'none';
 };
+
 window.selectCategory = function(btn, value) {
     document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');

@@ -98,7 +98,10 @@
             <input type="password" id="signInPass" placeholder="Password">
             <button class="primary-btn" onclick="firebaseSignIn()">Sign In</button>
         </div>
+        <!-- CHANGE 1: Sign Up form now includes Name and Username -->
         <div id="signUpForm" style="display:none;">
+            <input type="text" id="signUpName" placeholder="Full Name">
+            <input type="text" id="signUpUsername" placeholder="Username (e.g. @sidra)">
             <input type="text" id="signUpEmail" placeholder="Email">
             <input type="password" id="signUpPass" placeholder="Password">
             <button class="primary-btn" onclick="firebaseSignUp()">Sign Up</button>
@@ -141,11 +144,21 @@
             </div>
         </div>
 
+        <!-- CHANGE 2: Edit members panel - username lookup, no commas -->
         <div id="editMembersPanel" style="display:none; background:#f0f7ff; padding:12px; border-radius:12px; margin:8px 0;">
             <p style="font-weight:bold; font-size:13px; margin:0 0 8px;">✏️ Edit Members</p>
-            <input type="text" id="editMembersInput"
-                style="width:100%; padding:8px; border:1px solid #ccc; border-radius:8px; font-size:13px; box-sizing:border-box;"
-                placeholder="Comma-separated, e.g. Sidra, Sania, Ali">
+            <div style="display:flex; gap:6px; margin-bottom:8px;">
+                <input type="text" id="editUsernameInput"
+                    style="flex:1; padding:8px; border:1px solid #ccc; border-radius:8px; font-size:13px;"
+                    placeholder="Enter username (e.g. @sidra)"
+                    oninput="lookupUsername(this.value)">
+                <button onclick="addMemberFromUsername()"
+                    style="background:#2d8cff; color:white; border:none; padding:8px 12px; border-radius:8px; cursor:pointer; font-size:13px; white-space:nowrap;">
+                    + Add
+                </button>
+            </div>
+            <div id="usernameLookupResult" style="font-size:12px; margin-bottom:8px; min-height:16px;"></div>
+            <div id="currentMembersList" style="display:flex; flex-wrap:wrap; gap:6px; margin-bottom:10px;"></div>
             <div style="display:flex; gap:8px; margin-top:8px;">
                 <button onclick="saveEditedMembers()"
                     style="flex:1; background:#2d8cff; color:white; border:none; padding:8px; border-radius:8px; cursor:pointer; font-size:13px;">
@@ -156,6 +169,16 @@
                     Cancel
                 </button>
             </div>
+        </div>
+
+        <!-- CHANGE 3: Notification log panel -->
+        <div id="notifLogPanel" style="display:none; background:#fff8e6; border:1px solid #f7c948; padding:12px; border-radius:12px; margin:8px 0;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+                <p style="font-weight:bold; font-size:13px; margin:0;">🔔 Reminder Log</p>
+                <button onclick="document.getElementById('notifLogPanel').style.display='none'"
+                    style="background:none; border:none; font-size:16px; cursor:pointer; color:#aaa;">✕</button>
+            </div>
+            <div id="notifLogList" style="max-height:120px; overflow-y:auto;"></div>
         </div>
 
         <div class="chart-container" style="position:relative;">
@@ -195,6 +218,16 @@
         </button>
         <label class="input-label" id="whoPaidLabel">Who Paid?</label>
         <select id="payerSelect" class="payer-select"></select>
+
+        <!-- CHANGE 4: Payment method selector -->
+        <label class="input-label">Payment Method</label>
+        <div style="display:flex; gap:8px; margin-bottom:12px;">
+            <button id="pmUPI" onclick="selectPaymentMethod('UPI')" class="pay-method-btn active-pay">📱 UPI</button>
+            <button id="pmCash" onclick="selectPaymentMethod('Cash')" class="pay-method-btn">💵 Cash</button>
+            <button id="pmCard" onclick="selectPaymentMethod('Card')" class="pay-method-btn">💳 Card</button>
+        </div>
+        <input type="hidden" id="paymentMethodSelect" value="UPI">
+
         <div class="amount-section">
             <p>Amount</p>
             <input type="number" id="mainAmount" placeholder="0.00" class="amount-input" oninput="updateSplitFields()">

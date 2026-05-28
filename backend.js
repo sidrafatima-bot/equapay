@@ -12,6 +12,8 @@ import {
     signInWithEmailAndPassword,
     GoogleAuthProvider,
     signInWithPopup,
+signInWithRedirect,
+getRedirectResult,
     signOut,
     onAuthStateChanged,
     updateProfile
@@ -27,7 +29,8 @@ import {
     query,
     where,
     onSnapshot,
-    updateDoc
+    updateDoc,
+    setDoc
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 // ============================================================
@@ -48,6 +51,14 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
+getRedirectResult(auth).then((result) => {
+    if (result && result.user) {
+        const name = result.user.displayName || 'User';
+        document.getElementById('sidebarName').textContent = name;
+        loadGroups(result.user.uid);
+        window.showPage('dashboard');
+    }
+}).catch(err => console.error(err));
 
 // Keep track of active listeners so we can unsubscribe
 let activeGroupListener = null;
@@ -84,19 +95,74 @@ window.firebaseSignIn = function () {
 };
 
 // ============================================================
-//  SECTION 6: SIGN UP
+//  SECTION 6: SIGN UP — CHANGE 1: now saves name + username
 // ============================================================
 window.firebaseSignUp = function () {
+    const fullName = document.getElementById('signUpName').value.trim();
+    const username = document.getElementById('signUpUsername').value.trim().replace(/^@/, '').toLowerCase();
     const email = document.getElementById('signUpEmail').value.trim();
     const pass = document.getElementById('signUpPass').value.trim();
+
+    if (!fullName) { alert('Please enter your full name'); return; }
+    if (!username) { alert('Please enter a username'); return; }
     if (!email || !pass) { alert('Please enter email and password'); return; }
-    createUserWithEmailAndPassword(auth, email, pass)
-        .then((result) => {
-            const name = result.user.displayName || email.split('@')[0];
-            document.getElementById('sidebarName').textContent = name;
-            window.showPage('dashboard');
-        })
-        .catch(err => alert(err.message));
+
+    // Check if username is already taken
+    checkUsernameAvailable(username).then(available => {
+        if (!available) {
+            alert(`Username @${username} is already taken. Please choose another.`);
+            return;
+        }
+        createUserWithEmailAndPassword(auth, email, pass)
+            .then(async (result) => {
+                // Save display name to Firebase Auth profile
+                await updateProfile(result.user, { displayName: fullName });
+
+                // Save user profile to Firestore 'users' collection
+                await setDoc(doc(db, 'users', result.user.uid), {
+                    uid: result.user.uid,
+                    name: fullName,
+                    username: username,
+                    email: email,
+                    createdAt: new Date()
+                });
+
+                document.getElementById('sidebarName').textContent = fullName;
+                window.showPage('dashboard');
+            })
+            .catch(err => alert(err.message));
+    });
+};
+
+// ============================================================
+//  SECTION 6a: CHECK USERNAME AVAILABILITY
+// ============================================================
+async function checkUsernameAvailable(username) {
+    try {
+        const q = query(collection(db, 'users'), where('username', '==', username));
+        const snap = await getDocs(q);
+        return snap.empty; // true = available
+    } catch (err) {
+        console.error('Error checking username:', err);
+        return true; // allow if check fails
+    }
+}
+
+// ============================================================
+//  SECTION 6b: LOOKUP USER BY USERNAME (for edit members)
+//  CHANGE 2: Username-based member lookup
+// ============================================================
+window.lookupUserByUsername = async function(username) {
+    try {
+        const clean = username.replace(/^@/, '').toLowerCase();
+        const q = query(collection(db, 'users'), where('username', '==', clean));
+        const snap = await getDocs(q);
+        if (snap.empty) return null;
+        return snap.docs[0].data(); // { uid, name, username, email }
+    } catch (err) {
+        console.error('Error looking up username:', err);
+        return null;
+    }
 };
 
 // ============================================================
@@ -104,30 +170,7 @@ window.firebaseSignUp = function () {
 // ============================================================
 window.googleSignIn = function () {
     const provider = new GoogleAuthProvider();
-    signInWithPopup(auth, provider)
-        .then((result) => {
-            const name = result.user.displayName || 'User';
-            document.getElementById('sidebarName').textContent = name;
-            loadGroups(result.user.uid);
-            window.showPage('dashboard');
-        })
-        .catch(err => alert(err.message));
-};
-
-// ============================================================
-//  SECTION 8: LOGOUT
-// ============================================================
-window.logoutUser = function () {
-    // Stop any active listeners
-    if (activeGroupListener) { activeGroupListener(); activeGroupListener = null; }
-    signOut(auth)
-        .then(() => {
-            window.groups = [];
-            window.currentGroup = null;
-            renderDashboard();
-            window.showPage('welcome');
-        })
-        .catch(err => alert(err.message));
+    signInWithRedirect(auth, provider);
 };
 
 // ============================================================
@@ -138,6 +181,9 @@ window.updateUserName = async function (newName) {
     if (!user || !newName) return;
     try {
         await updateProfile(user, { displayName: newName });
+        // Also update in Firestore users collection
+        const userRef = doc(db, 'users', user.uid);
+        await updateDoc(userRef, { name: newName });
         document.getElementById('sidebarName').textContent = newName;
         alert('Name updated!');
     } catch (err) {
@@ -185,10 +231,8 @@ window.loadGroups = async function (uid) {
 
 // ============================================================
 //  SECTION 12: REAL-TIME GROUP LISTENER
-//  Call this when opening a group for live sync
 // ============================================================
 window.listenToGroup = function (groupId) {
-    // Unsubscribe from any previous listener
     if (activeGroupListener) { activeGroupListener(); activeGroupListener = null; }
 
     const groupRef = doc(db, 'groups', groupId);
@@ -197,7 +241,6 @@ window.listenToGroup = function (groupId) {
         const data = snap.data();
         window.currentGroup.expenses = data.expenses || [];
         window.currentGroup.settled = data.settled || [];
-        // Update in groups array too
         const idx = window.groups.findIndex(g => g.id === groupId);
         if (idx !== -1) window.groups[idx] = { ...window.groups[idx], ...data };
         renderChart();
@@ -207,7 +250,7 @@ window.listenToGroup = function (groupId) {
 };
 
 // ============================================================
-//  SECTION 13: SAVE EXPENSE - stored inside group document
+//  SECTION 13: SAVE EXPENSE
 // ============================================================
 window.saveExpense = async function (groupId, expense) {
     const user = auth.currentUser;
@@ -224,7 +267,7 @@ window.saveExpense = async function (groupId, expense) {
 };
 
 // ============================================================
-//  SECTION 14: LOAD EXPENSES - read from group document
+//  SECTION 14: LOAD EXPENSES
 // ============================================================
 window.loadExpenses = async function (groupId) {
     try {
@@ -238,7 +281,7 @@ window.loadExpenses = async function (groupId) {
 };
 
 // ============================================================
-//  SECTION 15: DELETE EXPENSE from group document
+//  SECTION 15: DELETE EXPENSE
 // ============================================================
 window.deleteExpense = async function (groupId, expenseIndex) {
     try {
@@ -257,7 +300,7 @@ window.deleteExpense = async function (groupId, expenseIndex) {
 };
 
 // ============================================================
-//  SECTION 16: EDIT EXPENSE in group document
+//  SECTION 16: EDIT EXPENSE
 // ============================================================
 window.editExpense = async function (groupId, expenseIndex, updatedExpense) {
     try {
@@ -275,7 +318,7 @@ window.editExpense = async function (groupId, expenseIndex, updatedExpense) {
 };
 
 // ============================================================
-//  SECTION 17: SAVE SETTLEMENT - stored inside group document
+//  SECTION 17: SAVE SETTLEMENT
 // ============================================================
 window.saveSettlement = async function (groupId, settlement) {
     const user = auth.currentUser;
@@ -292,7 +335,7 @@ window.saveSettlement = async function (groupId, settlement) {
 };
 
 // ============================================================
-//  SECTION 18: LOAD SETTLEMENTS - read from group document
+//  SECTION 18: LOAD SETTLEMENTS
 // ============================================================
 window.loadSettlements = async function (groupId) {
     try {
@@ -313,7 +356,6 @@ window.updateGroupMembers = async function (groupId, newMembers) {
         const groupRef = doc(db, 'groups', groupId);
         await updateDoc(groupRef, { members: newMembers });
         window.currentGroup.members = newMembers;
-        // Update payer select
         const payerSelect = document.getElementById('payerSelect');
         if (payerSelect) {
             payerSelect.innerHTML = newMembers.map(m => `<option value="${m}">${m}</option>`).join('');
@@ -328,7 +370,7 @@ window.updateGroupMembers = async function (groupId, newMembers) {
 };
 
 // ============================================================
-//  SECTION 20: DELETE GROUP FROM FIRESTORE
+//  SECTION 20: DELETE GROUP
 // ============================================================
 window.deleteGroup = async function (groupId) {
     try {
