@@ -16,8 +16,7 @@ CodeWarriors
 
 ---
 # EquaPay 💸
-Tagline here
-
+"EquaPay — Payments Made Fair and Simple."
 ## 📌 Product Overview
 
 ## 🌍 UN SDG Alignment
@@ -51,11 +50,15 @@ Tagline here
 ## 👥 Team Members
 
 ## 📜 License
+
+
 <img width="1536" height="1024" alt="logo png" src="https://github.com/user-attachments/assets/8168eace-1242-4557-8dca-3f53a32d20cf" />
 
 
 ## 📌 Project Overview
 EquaPay 💸
+
+
 “Because friendships should not break over ₹143.50.”
 EquaPay helps users manage and divide shared expenses efficiently among friends, roommates, and teams.  
 The platform simplifies bill splitting, balance tracking, and payment management with a clean and user-friendly interface.
