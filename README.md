@@ -1,15 +1,8 @@
-# equapay
+# EquaPay
 EPL Project
 <br>
 -CodeWarriors.
 <br>
-Author - Syeda Sidra Fatima <br>
-Umme Hafsa <br>
-Sania Noorin <br>
-Disha vyas
-# 💸 EquaPay
-#  EPL project
-
 > A smart and simple solution for managing shared expenses.
 
 ---
