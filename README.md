@@ -66,8 +66,6 @@ EquaPay 💸
 “Because friendships should not break over ₹143.50.”
 EquaPay helps users manage and divide shared expenses efficiently among friends, roommates, and teams.  
 The platform simplifies bill splitting, balance tracking, and payment management with a clean and user-friendly interface.
-## 📌 Product Overview
-
 Managing shared expenses in groups is often confusing and stressful. Whether it’s a college trip, hostel expenses, team lunch, or apartment rent, people struggle to calculate who owes whom.
 
 EquaPay solves this problem by providing an easy-to-use expense splitting platform where users can:
@@ -84,8 +82,6 @@ The application ensures fairness, transparency, and convenience in managing grou
 Our goal is to simplify collaborative spending and eliminate awkward money conversations between friends and teammates.
 
 ---
-
-## 🌍 UN SDG Alignment
 
 This project supports:
 ## 🌍 UN Sustainable Development Goals (SDG) Alignment
@@ -364,7 +360,7 @@ Every group member can clearly view:
 This improves accountability and avoids misunderstandings between users.
 
 
-# 10. 🛡️ Error Handling & Validation
+## 🛡️ Error Handling & Validation
 
 Example:
 
@@ -483,4 +479,9 @@ Team CodeWarriors
 
 ## 📜 License
 
-This project is created for educational and innovation purposes.
+This project is created for educational and innovation purposes-— feel free to use, modify, and distribute this project with proper attribution.
+This project is licensed under the MIT License.
+Permission is granted to use, modify, and distribute this software for educational and personal purposes.
+For more details, refer to the LICENSE file.
+© 2026 EquaPay Team
+
