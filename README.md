@@ -40,12 +40,13 @@ CodeWarriors
   
 ## 📸 Application Preview
 
+-Dashboard
+<img width="1600" height="941" alt="ChatGPT Image May 30, 2026, 03_18_33 AM" src="https://github.com/user-attachments/assets/755d726c-fa60-4a67-949c-d72690114561" />
+
+
 - Add expense
-<img width="1536" alt="image" src="https://github.com/user-attachments/assets/c40ae120-8d62-4c81-a1cd-f7a1f43cad2a" />
+<img width="1600" height="843" alt="ChatGPT Image May 30, 2026, 03_16_36 AM" src="https://github.com/user-attachments/assets/6e8ee78b-dfbf-48e9-80c6-210a1a69b3a9" />
 
-
-- Dashboard
-<img width="1536"  alt="image" src="https://github.com/user-attachments/assets/26a6e751-d24d-4083-96ae-9a1f13078d1c" />
 
 ---
 ![License](https://img.shields.io/badge/License-MIT-green)
