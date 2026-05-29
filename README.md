@@ -92,6 +92,28 @@ EquaPay/
 
 ---
 
+## 🏗️ System Architecture
+
+![System Architecture](images/architecture.png)
+
+---
+
+### Architecture Flow
+
+```text
+User
+↓
+Frontend (HTML, CSS, JavaScript)
+↓
+Firebase Authentication
+↓
+Cloud Firestore Database
+↓
+Analytics Dashboard & Expense Management
+```
+
+---
+
 ## 🌟 Project Highlights
 
 - Real-time expense synchronization using Firebase
