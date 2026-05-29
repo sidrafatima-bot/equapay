@@ -22,6 +22,25 @@ EquaPay helps users manage and divide shared expenses efficiently among friends,
 The platform simplifies bill splitting, balance tracking, and payment management with a clean and user-friendly interface.
 
 ---
+
+## 📑 Table of Contents
+
+- Application Preview
+- UN SDG Alignment
+- Features
+- Technologies Used
+- Project Structure
+- System Architecture
+- Project Highlights
+- Installation Guide
+- Error Handling
+- Development Journey
+- Future Improvements
+- Contributors
+- License
+
+  ---
+  
 ## 📸 Application Preview
 
 ![EquaPay Add Expense](images/Highlight1.png)
@@ -60,6 +79,26 @@ By promoting:
 - ✅ Email Verification
 - ✅ Password Reset
 - ✅ Responsive Design
+
+---
+
+## 🔄 Expense Workflow
+
+```text
+User Login
+↓
+Create Group
+↓
+Add Expense
+↓
+Choose Split Method
+↓
+Calculate Balances
+↓
+Track Settlements
+↓
+View Analytics
+```
 
 ---
 
