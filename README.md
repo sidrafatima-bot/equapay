@@ -42,8 +42,11 @@ CodeWarriors
 
 ![EquaPay Add Expense](images/Highlight1.png)
 ![EquaPay Dashboard](images/Highlight2.png)
-
 ---
+![License](https://img.shields.io/badge/License-MIT-green)
+![Frontend](https://img.shields.io/badge/Frontend-React-blue)
+![Backend](https://img.shields.io/badge/Backend-Node.js-green)
+
 
 ## 🌍 UN SDG Alignment
 
