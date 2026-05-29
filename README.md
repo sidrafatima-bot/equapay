@@ -198,7 +198,7 @@ Week 1: The Blueprint Blitz
 
 2.The Tech Justification: We researched and finalized our tech stack. Tech Stack
 
-3. The Logic Flow Architecture: We created a simple wireframe to exhibit our idea. Wireframe
+3.The Logic Flow Architecture: We created a simple wireframe to exhibit our idea. Wireframe
 
 Week 2: The Deployment Powerplay
 
