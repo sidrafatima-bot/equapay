@@ -40,8 +40,9 @@ CodeWarriors
   
 ## 📸 Application Preview
 
-![EquaPay Add Expense](images/Highlight1.png)
-![EquaPay Dashboard](images/Highlight2.png)
+<img width="400" alt="image" src="https://github.com/user-attachments/assets/c40ae120-8d62-4c81-a1cd-f7a1f43cad2a" />
+<img width="400"  alt="image" src="https://github.com/user-attachments/assets/26a6e751-d24d-4083-96ae-9a1f13078d1c" />
+
 ---
 ![License](https://img.shields.io/badge/License-MIT-green)
 ![Frontend](https://img.shields.io/badge/Frontend-React-blue)
