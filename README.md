@@ -188,6 +188,33 @@ The project safely handles:
 - Responsive fallback behavior
 
 ---
+## Development Journey
+
+This app was built for a junior-level technical competition conducted by our college. Every week, we attempted a series of given challenges that are showcased here:
+
+Week 1: The Blueprint Blitz
+1.The Rough Draft: A summary of our initial plan for the project was drafted. Summary
+2.The Tech Justification: We researched and finalized our tech stack. Tech Stack
+3. The Logic Flow Architecture: We created a simple wireframe to exhibit our idea. Wireframe
+
+Week 2: The Deployment Powerplay
+1.The Motivation Track: https://open.spotify.com/playlist/56wH7n2rRe2hijdbgEIfRp?si=1924d6b23c2d4921
+2.The Repo Setup: Hence, this repository was made!
+3.The UI/Circuit Milestone: A screenshot of the initial UI was shared.
+4.The Heart of The Project: A demo video showcasing our initial build was created. Demo
+
+Week 3: The Impact & Refinement Phase
+1.The Code Meme & Team Identity: A light-hearted round spent making meme collages. memes
+2.The Global Impact Mapping: An identification of the global impact our project contributed to was drafted. SDG goals
+3.The Core Error-Handling: We proved our code can handle chaotic user input, and dealt with edge cases. Error Handling
+4.The Optimization Milestone: We optimized our app to run faster, and added various quality-of-life features. Demo
+
+Week 4: The final integration(clean code & complete documentation)
+1.The Code Contribution & Cleanup Check: We pushed all of our code to our repository and merged our branches, finalizing our project at last.
+2.The “Shark Tank” Pitch Tagline & Poster: A simple poster to pitch our project was created. Poster
+3.The SDLC Lifecycle Mapping: A document of our build journey was drafted. SDLC Lifecycle Report
+4.The Production-Ready Technical README: The README.md file was finalized.
+
 
 ## 📈 Future Improvements
 
@@ -207,5 +234,26 @@ All members of Team CodeWarriors contributed to the design, development, testing
 ---
 
 ## 📜 License
+MIT License
+
+Copyright (c) 2026 EquaPay Team
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
 
 This project was developed by Team CodeWarriors as part of the EPL Project and is intended for educational and demonstration purposes.
