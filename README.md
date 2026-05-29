@@ -555,53 +555,16 @@ Through this project, the team gained practical experience in:
 * Debugging and testing
 * Software documentation
 
-## Development Journey
-
-This app was built for a junior-level technical competition conducted by our college. Every week, we attempted a series of given challenges that are showcased here:
-
-Week 1: The Blueprint Blitz
-
-1.The Rough Draft: A summary of our initial plan for the project was drafted. Summary
-2.The Tech Justification: We researched and finalized our tech stack. Tech Stack
-3.The Logic Flow Architecture: We created a simple wireframe to exhibit our idea. Wireframe
-
-Week 2: The Deployment Powerplay
-
-1.The Motivation Track: https://open.spotify.com/playlist/56wH7n2rRe2hijdbgEIfRp?si=1924d6b23c2d4921
-2.The Repo Setup: Hence, this repository was made!
-3.The UI/Circuit Milestone: A screenshot of the initial UI was shared.
-4.The Heart of The Project: A demo video showcasing our initial build was created. Demo
-
-Week 3: The Impact & Refinement Phase
-
-1.The Code Meme & Team Identity: A light-hearted round spent making meme collages. memes
-2.The Global Impact Mapping: An identification of the global impact our project contributed to was drafted. SDG goals
-3.The Core Error-Handling: We proved our code can handle chaotic user input, and dealt with edge cases. Error Handling
-4.The Optimization Milestone: We optimized our app to run faster, and added various quality-of-life features. Demo
-
-Week 4: The final integration(clean code & complete documentation)
-
-1.The Code Contribution & Cleanup Check: We pushed all of our code to our repository and merged our branches, finalizing our project at last.
-2.The “Shark Tank” Pitch Tagline & Poster: A simple poster to pitch our project was created. Poster
-3.The SDLC Lifecycle Mapping: A document of our build journey was drafted. SDLC Lifecycle Report
-4.The Production-Ready Technical README: The README.md file was finalized.
-
 
 ## 📈 Future Improvements
 
 - AI-powered spending insights
-<<<<<<< HEAD
 - Multi-currency support
 - UPI integration
 - Expense analytics dashboard
 - Real-time notifications
 - Mobile application
-=======
-- Mobile Application
-- Payment Gateway Integration
-- OCR Receipt Scanning
-- Multi-Currency Auto Conversion
-- Group Invite Links
+
 
 ---
 ## 📸 Final Gallery
