@@ -9,10 +9,10 @@ CodeWarriors
 
 ## 👥 Team CodeWarriors
 
-- Syeda Sidra Fatima
 - Umme Hafsa
-- Sania Noorin
 - Disha Vyas
+- Sania Noorin
+- Syeda Sidra Fatima
 
 ---
 
@@ -89,6 +89,7 @@ EquaPay/
 │── README.md
 │── images/
 ```
+
 ---
 
 ## 🌟 Project Highlights
@@ -140,12 +141,7 @@ The project safely handles:
 
 ## 🤝 Contributors
 
-This project was developed by Team CodeWarriors:
-
-- Umme Hafsa
-- Disha Vyas
-- Syeda Sidra Fatima
-- Sania Noorin
+All members of Team CodeWarriors contributed to the design, development, testing, and documentation of EquaPay.
 
 ---
 
