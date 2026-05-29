@@ -519,13 +519,13 @@ The development of EquaPay was completed through a structured engineering workfl
 3. The UI/Circuit Milestone: A screenshot of the initial UI was shared.
 4. The Heart of The Project: A demo video showcasing our initial build was created. 
 
-  Week 3: The Impact & Refinement Phase
+    Week 3: The Impact & Refinement Phase
 1.The Code Meme & Team Identity: A light-hearted round spent making meme collages. memes
 2. The Global Impact Mapping: An identification of the global impact our project contributed to was drafted. SDG goals
 3. The Core Error-Handling: We proved our code can handle chaotic user input, and dealt with edge cases. Error Handling
 4. The Optimization Milestone: We optimized our app to run faster, and added various quality-of-life features.
 
-  Week 4: The Final Integration (Clean Code & Complete Documentation)
+    Week 4: The Final Integration (Clean Code & Complete Documentation)
 1. The Code Contribution & Cleanup Check: We pushed all of our code to our repository and merged our branches, finalizing our project at last.
 2. The “Shark Tank” Pitch Tagline & Poster: A simple poster to pitch our project was created. Poster
 3. The SDLC Lifecycle Mapping: A document of our build journey was drafted. SDLC Lifecycle Report
