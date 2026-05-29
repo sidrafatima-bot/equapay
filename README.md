@@ -508,7 +508,8 @@ if(amount <= 0){
 
 The development of EquaPay was completed through a structured engineering workflow over multiple stages.This app was built for a junior-level technical competition conducted by our college. Every week, we attempted a series of given challenges that are showcased here:
 
-  Week 1: The Blueprint Blitz
+ 
+ Week 1: The Blueprint Blitz
   
 1. The Rough Draft: A summary of our initial plan for the project was drafted. Summary
    
@@ -516,7 +517,7 @@ The development of EquaPay was completed through a structured engineering workfl
    
 3. The Logic Flow Architecture: We created a simple wireframe to exhibit our idea. Wireframe
    
-  Week 2: The Deployment Powerplay
+ Week 2: The Deployment Powerplay
 1. The Motivation Track: https://open.spotify.com/playlist/56wH7n2rRe2hijdbgEIfRp?si=1f74ba8fc17544e7
    
 2. The Repo Setup: Hence, this repository was made!
@@ -525,7 +526,7 @@ The development of EquaPay was completed through a structured engineering workfl
   
 4. The Heart of The Project: A demo video showcasing our initial build was created. 
 
-    Week 3: The Impact & Refinement Phase
+ Week 3: The Impact & Refinement Phase
    
 1.The Code Meme & Team Identity: A light-hearted round spent making meme collages. memes
 
@@ -535,7 +536,7 @@ The development of EquaPay was completed through a structured engineering workfl
 
 4. The Optimization Milestone: We optimized our app to run faster, and added various quality-of-life features.
 
-    Week 4: The Final Integration (Clean Code & Complete Documentation)
+ Week 4: The Final Integration (Clean Code & Complete Documentation)
 
 1. The Code Contribution & Cleanup Check: We pushed all of our code to our repository and merged our branches, finalizing our project at last.
 
