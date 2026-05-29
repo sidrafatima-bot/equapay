@@ -536,6 +536,7 @@ Week 4: The Final Integration (Clean Code & Complete Documentation)
 3. The SDLC Lifecycle Mapping: A document of our build journey was drafted. SDLC Lifecycle Report
 4. The Production-Ready Technical README: The README.md file was finalized.
 
+
 ### Key Challenges Faced
 
 * Backend-database connection setup
