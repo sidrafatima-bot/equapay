@@ -40,7 +40,7 @@ CodeWarriors
   
 ## 📸 Application Preview
 
--Dashboard
+- Dashboard
 <img width="1600" height="941" alt="ChatGPT Image May 30, 2026, 03_18_33 AM" src="https://github.com/user-attachments/assets/755d726c-fa60-4a67-949c-d72690114561" />
 
 
