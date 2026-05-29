@@ -9,7 +9,6 @@
 </head>
 <body>
 
-<div class="phone">
     <div id="loadingSpinner" style="display:none; position:absolute; top:50%; left:50%;
     transform:translate(-50%,-50%); z-index:999; font-size:30px;">⏳</div>
     <div id="overlay" class="overlay" onclick="toggleMenu()"></div>
@@ -17,6 +16,9 @@
     <!-- SIDEBAR -->
     <div id="sidebar" class="sidebar">
         <h3 id="sidebarName">User</h3>
+        <p id="sidebarEmail"
+        style="font-size:12px;color:#999;margin-bottom:10px;">
+        </p>
         <input type="text" id="profileNameInput" placeholder="Update display name"
             style="width:100%; padding:7px 10px; border:1px solid #ddd; border-radius:8px; font-size:13px; box-sizing:border-box;">
         <button onclick="window.updateUserName(document.getElementById('profileNameInput').value.trim())"
@@ -26,6 +28,8 @@
         <hr>
         <p id="sidebarSettings" class="active-sidebar-link">Settings</p>
         <p id="sidebarGroups" onclick="window.showPage('dashboard')">Groups</p>
+        <p id="sidebarHistory" onclick="window.showPage('settlementHistory')">Settlement History</p>
+        <p id="sidebarAnalytics" onclick="window.showPage('analytics')">Analytics</p>
         <hr>
         <p id="sidebarDark" onclick="window.setTheme('dark')">Dark mode</p>
         <p id="sidebarLight" onclick="window.setTheme('light')">Light mode</p>
@@ -35,11 +39,13 @@
                 <option value="english">🇬🇧 English</option>
                 <option value="hindi">🇮🇳 Hindi</option>
                 <option value="telugu">🇮🇳 Telugu</option>
-                <option value="urdu">🇵 Urdu</option>
+                <option value="urdu">🇵🇰 Urdu</option>
+                <option value="tamil">🇮🇳 Tamil</option>
+                <option value="kannada">🇮🇳 Kannada</option>
             </select>
         </div>
         <div style="margin:8px 0;">
-            <label style="font-size:14px;">Currency</label>
+            <label id="currencyLabel" style="font-size:14px;">Currency</label>
             <select id="currencySelect" onchange="changeCurrency(this.value)" class="lang-select">
                 <option value="₹">₹ INR</option>
                 <option value="$">$ USD</option>
@@ -52,7 +58,7 @@
             </select>
         </div>
         <div style="margin:8px 0;">
-            <label style="font-size:14px;">Split type</label>
+            <label id="splitTypeLabel2" style="font-size:14px;">Split type</label>
             <select id="splitSelect" onchange="changeSplit(this.value)" class="lang-select">
                 <option value="Equal" id="optEqual">Equal</option>
                 <option value="Percentage" id="optPercentage">Percentage</option>
@@ -61,15 +67,45 @@
             </select>
         </div>
         <p id="sidebarNotif" onclick="toggleNotifications()">Notifications <span class="float-right">ON</span></p>
-        <p id="sidebarLogout" class="logout-link" onclick="window.showPage('welcome')">Logout</p>
+        <p id="sidebarLogout" class="logout-link" onclick="window.doLogout()">Logout</p>
     </div>
+
+    <div id="profileModal" class="modal-backdrop">
+    <div class="modal-sheet">
+        <div class="modal-handle"></div>
+
+        <p class="modal-title">👤 Edit Profile</p>
+
+        <div class="profile-row">
+            <label>Name</label>
+            <input type="text" id="profileName">
+        </div>
+
+        <div class="profile-row">
+            <label>Email</label>
+            <input type="email" id="profileEmail">
+        </div>
+
+        <button class="profile-save-btn">
+            Save Profile
+        </button>
+
+        <button class="profile-danger-btn"
+                onclick="closeModal('profileModal')">
+            Close
+        </button>
+    </div>
+</div>
 
     <!-- BOTTOM NAV -->
     <div id="bottomNav" class="bottom-nav">
         <button onclick="window.showPage('dashboard')" class="nav-btn">🏠<span>Home</span></button>
         <button onclick="window.showPage('addGroup')" class="nav-btn">👥<span>Groups</span></button>
         <button id="navAddBtn" onclick="addExpenseFromNav()" class="nav-btn nav-plus">+</button>
-        <button onclick="notifyOwed()" class="nav-btn">🔔<span>Remind</span></button>
+        <button onclick="notifyOwed()" class="nav-btn" style="position:relative;">
+            🔔<span id="notifBadge" style="display:none; position:absolute; top:2px; right:8px; background:#d46b82; color:white; border-radius:50%; font-size:9px; width:14px; height:14px; line-height:14px; text-align:center;"></span>
+            <span>Remind</span>
+        </button>
         <button onclick="toggleMenu()" class="nav-btn">☰<span>Menu</span></button>
     </div>
 
@@ -79,16 +115,16 @@
         <div class="circle bottom"></div>
         <img src="logo.png" class="welcome-logo">
         <div class="welcome-text">
-            <h1>Hello, User👋</h1>
-            <p>Welcome to Equapay</p>
-            <button class="primary-btn start-btn" onclick="window.showPage('login')">Get Started</button>
+            <h1 id="welcomeHello">Hello, User👋</h1>
+            <p id="welcomeSubtitle">Welcome to Equapay</p>
+            <button class="primary-btn start-btn" onclick="window.showPage('login')" id="welcomeStartBtn">Get Started</button>
         </div>
     </div>
 
     <!-- PAGE: LOGIN -->
     <div class="page" id="login">
         <img src="logo.png" class="login-logo">
-        <p class="tagline">Manage shared expenses without the stress.</p>
+        <p class="tagline" id="loginTagline">Manage shared expenses without the stress.</p>
         <div class="tabs">
             <button class="tab active-tab" id="signInTab" onclick="window.switchTab('signin')">Sign In</button>
             <button class="tab" id="signUpTab" onclick="window.switchTab('signup')">Sign Up</button>
@@ -96,20 +132,52 @@
         <div id="signInForm">
             <input type="text" id="signInEmail" placeholder="Email">
             <input type="password" id="signInPass" placeholder="Password">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">
+    <input type="checkbox" id="rememberMe"
+           style="width:auto;margin:0;">
+    <label id="rememberMeLabel" for="rememberMe" style="font-size:13px;">
+    Remember me
+</label>
+</div>
+            <div id="signInError" style="color:#d46b82; font-size:12px; margin:-10px 0 10px; display:none;"></div>
             <button class="primary-btn" onclick="firebaseSignIn()">Sign In</button>
+            <p style="text-align:center; margin-top:12px;">
+               <a id="forgotPasswordLink" href="#" onclick="showForgotPassword()">
+    Forgot Password?
+</a>
+            </p>
         </div>
-        <!-- CHANGE 1: Sign Up form now includes Name and Username -->
         <div id="signUpForm" style="display:none;">
             <input type="text" id="signUpName" placeholder="Full Name">
-            <input type="text" id="signUpUsername" placeholder="Username (e.g. @sidra)">
+            <input type="text" id="signUpUsername" placeholder="Username (e.g. @Alex)">
             <input type="text" id="signUpEmail" placeholder="Email">
             <input type="password" id="signUpPass" placeholder="Password">
+            <input type="password" id="signUpConfirmPass" placeholder="Confirm Password">
+            <div id="passStrengthBar" style="height:4px; border-radius:4px; background:#eee; margin:-10px 0 12px; transition:background 0.3s;"></div>
+            <div id="passStrengthMsg" style="font-size:11px; margin:-8px 0 10px; color:#aaa;"></div>
+            <div id="signUpError" style="color:#d46b82; font-size:12px; margin:-10px 0 10px; display:none;"></div>
             <button class="primary-btn" onclick="firebaseSignUp()">Sign Up</button>
         </div>
+
+        <!-- FORGOT PASSWORD PANEL -->
+        <div id="forgotPanel" style="display:none; background:#f0f7ff; padding:14px; border-radius:12px; margin-top:10px;">
+           <p id="resetPasswordTitle"
+   style="font-weight:bold; font-size:13px; margin:0 0 8px;">
+    🔑 Reset Password
+</p>
+            <input type="text" id="resetEmail" placeholder="Enter your email" style="margin-bottom:8px;">
+            <div id="resetMsg" style="font-size:12px; margin-bottom:8px; min-height:14px;"></div>
+            <div style="display:flex; gap:8px;">
+               <button id="sendResetBtn" onclick="sendPasswordReset()">
+    Send Reset Email
+</button>
+                <button onclick="document.getElementById('forgotPanel').style.display='none'" style="flex:1; background:#eee; border:none; padding:9px; border-radius:8px; cursor:pointer; font-size:13px;">Cancel</button>
+            </div>
+        </div>
+
         <p class="or-text">OR CONTINUE WITH</p>
         <div class="social-btns">
             <button class="tab social-btn" onclick="googleSignIn()">Google</button>
-            <button class="tab social-btn" onclick="window.showPage('dashboard')">Apple</button>
         </div>
     </div>
 
@@ -119,13 +187,13 @@
             <div class="menu-icon" onclick="toggleMenu()">☰</div>
             <img src="logo.png" class="dash-logo">
         </div>
-        <input type="text" class="search-bar" placeholder="Search groups...">
-        <p class="section-title">Your Groups</p>
+        <input type="text" class="search-bar" id="dashSearch" placeholder="Search groups...">
+        <p class="section-title" id="dashYourGroups">Your Groups</p>
         <div id="groupList"></div>
         <div id="noGroupsMsg" class="empty-state">
             <div class="icon">👥</div>
-            <p><b>No groups yet</b></p>
-            <p class="hint">Tap + to create your first group</p>
+            <p><b id="noGroupsText">No groups yet</b></p>
+            <p class="hint" id="noGroupsHint">Tap + to create your first group</p>
         </div>
     </div>
 
@@ -137,14 +205,28 @@
             <div style="display:flex; gap:10px; margin-left:auto;">
                 <button onclick="showEditMembers()" title="Edit Members"
                     style="background:none; border:none; font-size:20px; cursor:pointer;">✏️</button>
+               <button onclick="openRenameGroupModal()" title="Rename Group"
+                    style="background:none; border:none; font-size:20px; cursor:pointer;">🏷️</button>
                 <button onclick="shareExpenseSummary()" title="Share Summary"
                     style="background:none; border:none; font-size:20px; cursor:pointer;">📤</button>
+                <button onclick="exportGroupCSV()" title="Export CSV"
+                    style="background:none; border:none; font-size:20px; cursor:pointer;">📥</button>
                 <button onclick="confirmDeleteGroup()" title="Delete Group"
                     style="background:none; border:none; font-size:20px; cursor:pointer;">🗑️</button>
             </div>
         </div>
 
-        <!-- CHANGE 2: Edit members panel - username lookup, no commas -->
+        <!-- RENAME GROUP PANEL -->
+        <div id="renameGroupModal" style="display:none; background:#f0f7ff; padding:12px; border-radius:12px; margin:8px 0;">
+            <p style="font-weight:bold; font-size:13px; margin:0 0 8px;">🏷️ Rename Group</p>
+            <input type="text" id="renameGroupInput" placeholder="New group name" style="margin-bottom:8px;">
+            <div style="display:flex; gap:8px;">
+                <button onclick="saveRenameGroup()" style="flex:1; background:#2d8cff; color:white; border:none; padding:8px; border-radius:8px; cursor:pointer; font-size:13px;">Save</button>
+                <button onclick="document.getElementById('renameGroupModal').style.display='none'" style="flex:1; background:#eee; border:none; padding:8px; border-radius:8px; cursor:pointer; font-size:13px;">Cancel</button>
+            </div>
+        </div>
+
+        <!-- EDIT MEMBERS PANEL -->
         <div id="editMembersPanel" style="display:none; background:#f0f7ff; padding:12px; border-radius:12px; margin:8px 0;">
             <p style="font-weight:bold; font-size:13px; margin:0 0 8px;">✏️ Edit Members</p>
             <div style="display:flex; gap:6px; margin-bottom:8px;">
@@ -171,7 +253,7 @@
             </div>
         </div>
 
-        <!-- CHANGE 3: Notification log panel -->
+        <!-- NOTIFICATION LOG PANEL -->
         <div id="notifLogPanel" style="display:none; background:#fff8e6; border:1px solid #f7c948; padding:12px; border-radius:12px; margin:8px 0;">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
                 <p style="font-weight:bold; font-size:13px; margin:0;">🔔 Reminder Log</p>
@@ -181,8 +263,8 @@
             <div id="notifLogList" style="max-height:120px; overflow-y:auto;"></div>
         </div>
 
-        <div class="chart-container" style="position:relative;">
-            <canvas id="pieChart" height="200"></canvas>
+        <div class="chart-container" style="position:relative; width:200px; max-width:100%; margin:0 auto;">
+            <canvas id="pieChart" width="200" height="200"></canvas>
             <div id="chartMembers" style="display:flex; justify-content:center; gap:12px; flex-wrap:wrap; margin-top:8px;"></div>
         </div>
 
@@ -198,9 +280,9 @@
     <div class="page" id="addExpense">
         <div class="header">
             <div onclick="window.showPage('apartment')" class="back-arrow">←</div>
-            <h3>Add Expense</h3>
+            <h3 id="addExpenseTitle">Add Expense</h3>
         </div>
-        <label class="input-label">Category</label>
+        <label class="input-label" id="categoryLabel">Category</label>
         <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:12px;">
             <button onclick="selectCategory(this,'🍔 Food')" class="cat-btn active">🍔 Food</button>
             <button onclick="selectCategory(this,'🚗 Travel')" class="cat-btn">🚗 Travel</button>
@@ -212,15 +294,14 @@
         <input type="hidden" id="categorySelect" value="🍔 Food">
         <label class="input-label" id="itemNameLabel">Item Name:</label>
         <input type="text" id="expName" placeholder="e.g. Electricity">
-        <button onclick="window.open('receipt-scanner.html','_blank','width=340,height=700')"
-            style="width:100%; padding:10px; border:2px dashed #2d8cff; border-radius:12px; background:#f0f7ff; color:#2d8cff; font-weight:bold; cursor:pointer; margin-bottom:12px;">
-            📸 Scan Receipt Instead
-        </button>
+       <label class="input-label" id="notesLabel">Notes (optional)</label>
+        <input type="text" id="expNotes" placeholder="Add a note...">
+       <label class="input-label" id="dateLabel">Date</label>
+        <input type="date" id="expDate">
         <label class="input-label" id="whoPaidLabel">Who Paid?</label>
         <select id="payerSelect" class="payer-select"></select>
 
-        <!-- CHANGE 4: Payment method selector -->
-        <label class="input-label">Payment Method</label>
+        <label class="input-label" id="paymentMethodLabel">Payment Method</label>
         <div style="display:flex; gap:8px; margin-bottom:12px;">
             <button id="pmUPI" onclick="selectPaymentMethod('UPI')" class="pay-method-btn active-pay">📱 UPI</button>
             <button id="pmCash" onclick="selectPaymentMethod('Cash')" class="pay-method-btn">💵 Cash</button>
@@ -229,7 +310,7 @@
         <input type="hidden" id="paymentMethodSelect" value="UPI">
 
         <div class="amount-section">
-            <p>Amount</p>
+            <p id="amountLabel">Amount</p>
             <input type="number" id="mainAmount" placeholder="0.00" class="amount-input" oninput="updateSplitFields()">
         </div>
         <label class="input-label" id="splitTypeLabel">Split Type</label>
@@ -243,27 +324,116 @@
             <div id="splitInputsContainer"></div>
             <p id="splitValidMsg" style="font-size:12px; margin-top:4px;"></p>
         </div>
-        <button class="primary-btn" onclick="calculateSplit()">Confirm Split</button>
+        <button class="primary-btn" id="confirmSplitBtn" onclick="calculateSplit()">Confirm Split</button>
     </div>
 
     <!-- PAGE: ADD GROUP -->
     <div class="page" id="addGroup">
         <div class="header">
             <div onclick="window.showPage('dashboard')" class="back-arrow">←</div>
-            <h3>New Group</h3>
+            <h3 id="newGroupTitle">New Group</h3>
         </div>
         <label class="input-label" id="groupNameLabel">Group Name:</label>
         <input type="text" id="groupInput" placeholder="e.g., Weekend Trip">
         <label class="input-label" id="groupMembersLabel">Group Members:</label>
-        <input type="text" id="groupMembers" placeholder="Add names (e.g. Sidra, Sania)">
+        <div style="display:flex; gap:8px; align-items:center;">
+            <input type="text" id="groupMembers" placeholder="Add names (e.g. Hafsa, Disha)"
+                   style="margin-bottom:0; flex:1;">
+            <button onclick="addMember()"
+                    style="width:42px; height:42px; border-radius:50%; background:#2d8cff;
+                           color:white; border:none; font-size:22px; cursor:pointer; flex-shrink:0;">+</button>
+        </div>
+        <div id="memberTags" style="display:flex; flex-wrap:wrap; gap:6px; margin-top:10px;"></div>
         <label class="input-label" id="groupDescLabel">Description (optional):</label>
         <input type="text" id="groupDesc" placeholder="What is this group for?">
-        <button class="primary-btn" onclick="window.addNewGroup()">Create Group</button>
+        <button class="primary-btn" id="createGroupBtn" onclick="window.addNewGroup()">Create Group</button>
     </div>
 
-</div>
+    <!-- PAGE: SETTLEMENT HISTORY -->
+    <div class="page" id="settlementHistory">
+        <div class="header">
+            <div onclick="window.showPage('dashboard')" class="back-arrow">←</div>
+         <h3 id="settlementHistoryTitlePage">Settlement History</h3>
+        </div>
+        <div id="settlementHistoryContainer"></div>
+    </div>
 
+    <!-- PAGE: ANALYTICS -->
+    <div class="page" id="analytics">
+        <div class="header">
+            <div onclick="window.showPage('dashboard')" class="back-arrow">←</div>
+            <h3 id="analyticsTitle">Analytics</h3>
+        </div>
+        <div id="analyticsContainer"></div>
+    </div>
+<div id="editExpenseModal" class="modal-backdrop">
+    <div class="modal-sheet">
+        <div class="modal-handle"></div>
+
+        <p class="modal-title">✏️ Edit Expense</p>
+
+        <input type="text"
+               id="editExpenseName"
+               placeholder="Expense Name">
+
+        <input type="number"
+               id="editExpenseAmount"
+               placeholder="Amount">
+
+        <button class="primary-btn"
+                onclick="saveEditedExpense()">
+            Save Changes
+        </button>
+
+        <button class="profile-danger-btn"
+                onclick="closeModal('editExpenseModal')">
+            Cancel
+        </button>
+    </div>
+</div>
 <script src="script.js" defer></script>
+<div id="toastMsg"></div>
 <script type="module" src="backend.js"></script>
+<div id="toastMsg"></div>
+<div id="modalBackdrop" class="modal-backdrop">
+    <div class="modal-sheet">
+        <div class="modal-handle"></div>
+        <div id="modalContent"></div>
+    </div>
+</div>
+<div id="editExpenseModal" class="modal-backdrop">
+    <div class="modal-sheet">
+        <div class="modal-handle"></div>
+        <h3 class="modal-title">Edit Expense</h3>
+
+        <input type="text" id="editExpenseName" placeholder="Expense Name">
+        <input type="number" id="editExpenseAmount" placeholder="Amount">
+
+        <button class="primary-btn" onclick="saveEditedExpense()">
+            Save Changes
+        </button>
+    </div>
+</div>
+<div id="profileModal" class="modal-backdrop">
+    <div class="modal-sheet">
+        <div class="modal-handle"></div>
+
+        <h3 class="modal-title">Profile Settings</h3>
+
+        <div class="profile-row">
+            <label>Name</label>
+            <input type="text" id="profileName">
+        </div>
+
+        <div class="profile-row">
+            <label>Email</label>
+            <input type="text" id="profileEmail">
+        </div>
+
+        <button class="profile-save-btn">
+            Save Profile
+        </button>
+    </div>
+</div>
 </body>
 </html>
