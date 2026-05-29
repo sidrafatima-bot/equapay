@@ -140,7 +140,12 @@ The project safely handles:
 
 ## 🤝 Contributors
 
-Team CodeWarriors
+This project was developed by Team CodeWarriors:
+
+- Umme Hafsa
+- Disha Vyas
+- Syeda Sidra Fatima
+- Sania Noorin
 
 ---
 
