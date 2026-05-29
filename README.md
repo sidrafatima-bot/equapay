@@ -1,5 +1,5 @@
 # EquaPay
-EPL Project
+EPL Project.
 <br>
 CodeWarriors
 <br>
