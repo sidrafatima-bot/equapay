@@ -1,24 +1,31 @@
-body {
-    margin: 0;
-    background: #dff0f2;
-    font-family: 'Segoe UI', Arial, sans-serif;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-    overflow: hidden;
+
+body{
+  margin:0;
+  background:#dff0f2;
+  font-family:'Segoe UI',Arial,sans-serif;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  min-height:100vh;
+  overflow:hidden;
 }
 
-.phone {
-    width: 300px;
-    height: 620px;
-    background: #f1fdf4;
-    border-radius: 40px;
-    overflow: hidden;
-    position: relative;
-    box-shadow: 0 20px 50px rgba(0,0,0,0.2);
-    border: 8px solid #333;
+
+/* ── Phone shell (Border Removed) ── */
+.phone{
+  width:100%;
+  max-width:420px;
+  height:100vh;
+  background:#f1fdf4;
+  overflow:hidden;
+  position:relative;
+
+  /* Removed mobile frame */
+  border:none;
+  border-radius:0;
+  box-shadow:none;
 }
+
 
 .page {
     display: none;
@@ -34,6 +41,7 @@ body {
     opacity: 0;
     transform: translateY(10px);
     transition: opacity 0.25s ease, transform 0.25s ease;
+  background:#f1fdf4;
 }
 
 .page.active {
@@ -224,4 +232,37 @@ input, textarea {
 
 @keyframes fall {
     to { transform: translateY(100vh) rotate(360deg); opacity: 0; }
+}
+
+.dark-mode,
+.dark-mode body {
+    background: #1a1a1a !important;
+    color: white !important;
+}
+
+.dark-mode .page {
+    background: #1a1a1a !important;
+    color: white !important;
+}
+
+.dark-mode .top-bar,
+.dark-mode .bottom-nav {
+    background: #222 !important;
+    color: white !important;
+}
+
+.dark-mode input,
+.dark-mode select,
+.dark-mode textarea {
+    background: #333 !important;
+    color: white !important;
+    border-color: #555 !important;
+}
+
+.dark-mode .settings-card,
+.dark-mode .expense-item-card,
+.dark-mode .expense-card,
+.dark-mode .modal-sheet {
+    background: #2d2d2d !important;
+    color: white !important;
 }
