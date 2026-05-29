@@ -15,8 +15,9 @@ CodeWarriors
 - Syeda Sidra Fatima
 
 ---
+
 # EquaPay 💸
-"EquaPay — Payments Made Fair and Simple."
+"EquaPay — Payments Made Fair and Simple".
 ## 📌 Product Overview
 
 ## 📑 Table of Contents
@@ -39,10 +40,17 @@ CodeWarriors
   
 ## 📸 Application Preview
 
-![EquaPay Add Expense](images/Highlight1.png)
-![EquaPay Dashboard](images/Highlight2.png)
+- Add expense
+<img width="1536" alt="image" src="https://github.com/user-attachments/assets/c40ae120-8d62-4c81-a1cd-f7a1f43cad2a" />
+
+
+- Dashboard
+<img width="1536"  alt="image" src="https://github.com/user-attachments/assets/26a6e751-d24d-4083-96ae-9a1f13078d1c" />
 
 ---
+![License](https://img.shields.io/badge/License-MIT-green)
+![GitHub](https://img.shields.io/badge/GitHub-Version%20Control-black?logo=github)
+
 
 ## 🌍 UN SDG Alignment
 
@@ -185,27 +193,34 @@ View Analytics
 - JavaScript
 =======
 |------------|---------|
-| HTML5 | Structure |
-| CSS3 | Styling |
+| HTML5 | Structure |                                                                      
+| CSS3 | Styling |                                                    
 | JavaScript | Frontend Logic |
 | Firebase Authentication | User Login & Security |
 | Cloud Firestore | Database Storage |
 | Chart.js | Analytics & Visualizations |
 | GitHub | Version Control |
 
+![HTML5](https://img.shields.io/badge/HTML5-Structure-orange?logo=html5)
+![CSS3](https://img.shields.io/badge/CSS3-Styling-blue?logo=css3)
+![JavaScript](https://img.shields.io/badge/JavaScript-Frontend%20Logic-yellow?logo=javascript)
+![Firebase Authentication](https://img.shields.io/badge/Firebase-Authentication-orange?logo=firebase)
+![Cloud Firestore](https://img.shields.io/badge/Cloud%20Firestore-Database-yellow?logo=firebase)
+![Chart.js](https://img.shields.io/badge/Chart.js-Analytics-red?logo=chartdotjs)
 
 ### Backend
 - Node.js
-- Express.js
+- Firebase
 
 ### Database
 - PostgreSQL
-- Supabase
+- Firestore
 
 ### Tools & Platforms
 - GitHub
 - VS Code
 - Figma
+- Canva
 ---
 
 ## 📂 Project Structure
