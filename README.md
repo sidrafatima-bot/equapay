@@ -617,28 +617,32 @@ Week 4: The final integration(clean code & complete documentation)
 ---
 ## 📸 Final Gallery
     - welcome-page
-      <img width="928" height="1562" alt="image" src="https://github.com/user-attachments/assets/d6fd1c9e-2f43-465b-8f19-8be495032146" />
+      <img width="1347" height="638" alt="GET STARTED" src="https://github.com/user-attachments/assets/089516de-8392-480b-9795-bc25fe4f85a1" />
 
     - login/sign in page
-      <img width="928" height="1562" alt="Frame 5" src="https://github.com/user-attachments/assets/4955fccb-5ed7-41af-b493-91f4b50ec0ce" />
+      <img width="1920" height="911" alt="AUTH" src="https://github.com/user-attachments/assets/ee6d146d-a53d-4d84-8f52-e48c7fe9461d" />
 
     - Dashboard page
-      <img width="928" height="1562" alt="image" src="https://github.com/user-attachments/assets/03678614-6c6e-48ba-b7a7-0b068681042b" />
+      <img width="1920" height="920" alt="GROUPS" src="https://github.com/user-attachments/assets/80f42138-5933-42a9-aa34-aed30bfbd450" />
 
     - create group page
-      <img width="927" height="1562" alt="create-group" src="https://github.com/user-attachments/assets/d30c1419-9e0e-49ba-ac3d-eb9e39a90e35" />
-
-    - group details page
-      <img width="928" height="1561" alt="Frame 2" src="https://github.com/user-attachments/assets/ddc510a0-53fe-469c-b291-3769c91aef4d" />
+      <img width="1920" height="925" alt="CREATE GROUP" src="https://github.com/user-attachments/assets/c8af4cb4-d1cd-48ad-99c0-ab7ce52d818f" />
 
     - add expense page
-      <img width="936" height="1570" alt="Frame 7" src="https://github.com/user-attachments/assets/48ac214a-5bc6-4f65-a602-1ec408a87a68" />
+      <img width="1919" height="913" alt="ADD EXPENSE" src="https://github.com/user-attachments/assets/1b12cbda-2223-4769-8ce1-ec073c833918" />
 
-    - settings page
-      <img width="928" height="1562" alt="Frame 8" src="https://github.com/user-attachments/assets/f276b752-046d-4b1c-a737-01162cf07560" />
+     - Settlement page
+       <img width="1920" height="911" alt="SETTLEMENT-HISTORY" src="https://github.com/user-attachments/assets/e322a447-3abe-47fa-a5fd-9558840559c7" />
 
-    - flowchart page
-      <img width="1488" height="1057" alt="flowchart" src="https://github.com/user-attachments/assets/2f068b60-372c-4c33-9453-021cee029946" />
+     - Analytics page
+        <img width="1920" height="920" alt="ANALYTICS " src="https://github.com/user-attachments/assets/a4553036-4b58-4668-89c7-886c505be5b2" />
+
+      - Settings page
+      <img width="1920" height="937" alt="MENU" src="https://github.com/user-attachments/assets/d50ee2bf-b49e-4b4e-acc9-a87aa0de2ec3" />
+
+      - Flowchart page
+      <img width="1046" height="683" alt="image" src="https://github.com/user-attachments/assets/f108b4c3-1f20-49b7-ae64-a21821019ab9" />
+
 
 
 
