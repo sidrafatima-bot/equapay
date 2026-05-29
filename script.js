@@ -6,6 +6,7 @@ window.notificationsEnabled = true;
 window.notificationLog = [];
 window.groups = [];
 
+
 // ============================================================
 //  PAGE NAVIGATION
 // ============================================================
@@ -18,6 +19,7 @@ window.showToast = function(msg) {
         toast.classList.remove("show");
     }, 3000);
 }
+
 
 
 window.openRemindPanel = function() {
