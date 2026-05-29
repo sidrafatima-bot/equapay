@@ -15,8 +15,9 @@ CodeWarriors
 - Syeda Sidra Fatima
 
 ---
+
 # EquaPay 💸
-"EquaPay — Payments Made Fair and Simple."
+"EquaPay — Payments Made Fair and Simple".
 ## 📌 Product Overview
 
 ## 📑 Table of Contents
