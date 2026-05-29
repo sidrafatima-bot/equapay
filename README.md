@@ -40,13 +40,18 @@ CodeWarriors
   
 ## 📸 Application Preview
 
-<img width="400" alt="image" src="https://github.com/user-attachments/assets/c40ae120-8d62-4c81-a1cd-f7a1f43cad2a" />
-<img width="400"  alt="image" src="https://github.com/user-attachments/assets/26a6e751-d24d-4083-96ae-9a1f13078d1c" />
+<img width="600" alt="image" src="https://github.com/user-attachments/assets/c40ae120-8d62-4c81-a1cd-f7a1f43cad2a" />
+<img width="600"  alt="image" src="https://github.com/user-attachments/assets/26a6e751-d24d-4083-96ae-9a1f13078d1c" />
 
 ---
 ![License](https://img.shields.io/badge/License-MIT-green)
-![Frontend](https://img.shields.io/badge/Frontend-React-blue)
-![Backend](https://img.shields.io/badge/Backend-Node.js-green)
+![HTML5](https://img.shields.io/badge/HTML5-Structure-orange?logo=html5)
+![CSS3](https://img.shields.io/badge/CSS3-Styling-blue?logo=css3)
+![JavaScript](https://img.shields.io/badge/JavaScript-Frontend%20Logic-yellow?logo=javascript)
+![Firebase Authentication](https://img.shields.io/badge/Firebase-Authentication-orange?logo=firebase)
+![Cloud Firestore](https://img.shields.io/badge/Cloud%20Firestore-Database-yellow?logo=firebase)
+![Chart.js](https://img.shields.io/badge/Chart.js-Analytics-red?logo=chartdotjs)
+![GitHub](https://img.shields.io/badge/GitHub-Version%20Control-black?logo=github)
 
 
 ## 🌍 UN SDG Alignment
@@ -201,16 +206,17 @@ View Analytics
 
 ### Backend
 - Node.js
-- Express.js
+- Firebase
 
 ### Database
 - PostgreSQL
-- Supabase
+- Firestore
 
 ### Tools & Platforms
 - GitHub
 - VS Code
 - Figma
+- Canva
 ---
 
 ## 📂 Project Structure
