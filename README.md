@@ -195,11 +195,9 @@ View Analytics
 ![Chart.js](https://img.shields.io/badge/Chart.js-Analytics-red?logo=chartdotjs)
 
 ### Backend
-- Node.js
 - Firebase
 
 ### Database
-- PostgreSQL
 - Firestore
 
 ### Tools & Platforms
