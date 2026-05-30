@@ -562,9 +562,10 @@ Through this project, the team gained practical experience in:
 - Expense analytics dashboard
 - Real-time notifications
 - Mobile application
-
+- Scan Receipt
 
 ---
+
 ## 📸 Final Gallery
 
 ## Welcome Page
