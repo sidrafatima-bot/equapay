@@ -68,7 +68,8 @@ CodeWarriors
 ## 🛡️ Error Handling & Validation
 ## 🚀 Development Journey
 ## 🔮 Future Improvements
-## 📸 Final Gallery## 👥 Team Members
+## 📸 Final Gallery
+## 👥 Team Members
 ## 📜 License
 
 <img width="1536" height="1024" alt="logo png" src="https://github.com/user-attachments/assets/8168eace-1242-4557-8dca-3f53a32d20cf" />
