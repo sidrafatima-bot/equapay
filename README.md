@@ -143,7 +143,7 @@ Money-related misunderstandings are a common source of conflict in groups. EquaP
 - ✅ Email Verification
 - ✅ Password Reset
 - ✅ Responsive Design
-- ✅ Fast Updates
+- ✅ Reminders
 
 ---
 
