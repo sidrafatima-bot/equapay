@@ -18,7 +18,8 @@ CodeWarriors
 
 # EquaPay 💸
 "EquaPay — Payments Made Fair and Simple".
-## 📌 Product Overview
+
+---
 
 ## 📑 Table of Contents
 
@@ -40,18 +41,18 @@ CodeWarriors
   
 ## 📸 Application Preview
 
-- Dashboard
-<img width="1600" height="941" alt="ChatGPT Image May 30, 2026, 03_18_33 AM" src="https://github.com/user-attachments/assets/755d726c-fa60-4a67-949c-d72690114561" />
+### Dashboard
+![Dashboard](images/HOME.png)
 
-
-- Add expense
-<img width="1600" height="843" alt="ChatGPT Image May 30, 2026, 03_16_36 AM" src="https://github.com/user-attachments/assets/6e8ee78b-dfbf-48e9-80c6-210a1a69b3a9" />
-
+### Add Expense
+![Add Expense](images/ADD-EXPENSE.png)
 
 ---
+
 ![License](https://img.shields.io/badge/License-MIT-green)
 ![GitHub](https://img.shields.io/badge/GitHub-Version%20Control-black?logo=github)
 
+---
 
 ## 🌍 UN SDG Alignment
 
@@ -88,6 +89,7 @@ CodeWarriors
 
 <img width="1536" height="1024" alt="logo png" src="https://github.com/user-attachments/assets/8168eace-1242-4557-8dca-3f53a32d20cf" />
 
+---
 
 ## 📌 Project Overview
 EquaPay 💸
@@ -134,7 +136,6 @@ Money-related misunderstandings are a common source of conflict in groups. EquaP
 ## ✨ Features
 
 
-- 👥 Group creation and management
 - 💰 Expense tracking
 - ⚖️ Automatic equal splitting
 - 📊 Balance calculation
@@ -142,9 +143,7 @@ Money-related misunderstandings are a common source of conflict in groups. EquaP
 - ❌ Negative amount prevention
 - 📱 Clean and responsive UI
 - 🔄 Real-time updates
-
 - ✅ User Authentication (Email & Google Sign-In)
-- ✅ Expense Tracking
 - ✅ Smart Bill Splitting (Equal, Percentage, Exact & Share Based)
 - ✅ Real-Time Balance Calculation
 - ✅ Group Management
@@ -295,10 +294,11 @@ The application should now run locally on:
 http://localhost:3000
 ```
 
+---
 
 ## 🏗️ System Architecture
 
-![System Architecture](images/architecture.png.png)
+![System Architecture](images/ARCHITECTURE.png)
 
 ---
 
@@ -380,6 +380,9 @@ Sensitive configuration values such as database URLs and API credentials are sto
 * Role-based access control
 * HTTPS deployment
 * Multi-factor authentication
+
+ ---
+ 
 ## ✨ Feature Breakdown
 
 ### 👥 Group Management
