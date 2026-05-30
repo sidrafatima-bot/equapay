@@ -3,7 +3,7 @@ EPL Project
 <br>
 CodeWarriors
 <br>
-> A smart and simple solution for managing shared expenses.
+> A smart and simple way for managing shared expenses.
 
 ---
 
