@@ -1,7 +1,7 @@
 # EquaPay
 EPL Project
 <br>
-CodeWarriors
+CodeWarriors.
 <br>
 > A smart and simple solution for managing shared expenses.
 
