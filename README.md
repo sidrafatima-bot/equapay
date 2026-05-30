@@ -79,7 +79,6 @@ CodeWarriors
 ## 📌 Project Overview
 EquaPay 💸
 
-
 “Because friendships should not break over ₹143.50.”
 EquaPay helps users manage and divide shared expenses efficiently among friends, roommates, and teams.  
 The platform simplifies bill splitting, balance tracking, and payment management with a clean and user-friendly interface.
