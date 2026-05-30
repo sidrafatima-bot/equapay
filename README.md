@@ -585,7 +585,7 @@ Through this project, the team gained practical experience in:
 ## 📸 Final Gallery
 
 ## Welcome Page
-![GET STARTED](IMAGES/GET-STARTED.png)
+![GET STARTED](images/GET-STARTED.png)
 
 ### Login / Sign In Page
 ![AUTH](images/AUTH.png)
