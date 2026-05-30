@@ -266,3 +266,32 @@ input, textarea {
     background: #2d2d2d !important;
     color: white !important;
 }
+.dark-mode .payment-breakdown {
+    background: #2d2d2d !important;
+    color: white !important;
+}
+.dark-mode .expense-item-card {
+    background: #2d2d2d !important;
+    color: white !important;
+}
+/* Expense cards */
+.dark-mode .expense-item-card {
+    background: #2d2d2d !important;
+    color: white !important;
+}
+
+/* Payment breakdown card */
+.dark-mode .expense-item-card + div,
+.dark-mode #resultContainer div[style*="background:white"] {
+    background: #2d2d2d !important;
+}
+
+/* Payment breakdown labels */
+.dark-mode .expense-item-card {
+    background: #2d2d2d !important;
+}
+
+.dark-mode .expense-item-card  {
+    color: white !important;
+    background: #2d2d2d !important;
+}

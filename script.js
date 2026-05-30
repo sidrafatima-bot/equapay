@@ -431,7 +431,7 @@ window.renderExpenseLog = function () {
             <div style="font-size:30px;">🧾</div><p><b>${t.noExpenses}</b></p>
             <p style="font-size:12px;">${t.tapToAdd}</p></div>`;
     } else {
-        resultBox.innerHTML += `<p style="font-weight:bold; color:#555; font-size:13px; margin:10px 0 8px;">${t.expenseHistory}</p>`;
+        resultBox.innerHTML += `<p style="font-weight:bold; color:${document.body.classList.contains('dark-mode') ? 'white' : '#555'};; font-size:13px; margin:10px 0 8px;">${t.expenseHistory}</p>`;
         [...window.currentGroup.expenses].reverse().forEach(exp => {
             const splits = window.currentGroup.members.map(m => {
                 const amt = exp.splits ? exp.splits[m] : (exp.amount / window.currentGroup.members.length);
@@ -449,8 +449,8 @@ window.renderExpenseLog = function () {
 const receiptBadge = exp.receipt ? `<div style="margin-top:6px;"><img src="${exp.receipt}" style="max-width:100%; max-height:120px; border-radius:8px; cursor:pointer;" onclick="window.open('${exp.receipt}')"></div>` : '';
             const expIndex = window.currentGroup.expenses.indexOf(exp);
             resultBox.innerHTML += `
-                <div class="expense-item-card" style="background:white; padding:12px; border-radius:12px; margin-bottom:8px; box-shadow:0 2px 6px rgba(0,0,0,0.05);">
-                    <div style="display:flex; justify-content:space-between; font-size:13px; font-weight:bold; color:#333; align-items:center;">
+                <div class="expense-item-card" style="background:${document.body.classList.contains('dark-mode') ? '#2d2d2d' : '#f8f9fa'}; padding:12px; border-radius:12px; margin-bottom:8px; box-shadow:0 2px 6px rgba(0,0,0,0.05);">
+                    <div style="display:flex; justify-content:space-between; font-size:13px; font-weight:bold; color:${document.body.classList.contains('dark-mode') ? 'white' : '#333'}; ; align-items:center;">
                         <span>${exp.category || ''} ${exp.name} ${splitLabel}${pmBadge}${notesBadge}${receiptBadge}</span>
                         <div style="display:flex; align-items:center; gap:6px;">
                             <span style="font-size:10px; color:#aaa; font-weight:normal;">${exp.date || ''}</span>
@@ -459,7 +459,7 @@ const receiptBadge = exp.receipt ? `<div style="margin-top:6px;"><img src="${exp
                             <button onclick="confirmDeleteExpense(${expIndex})" style="background:none; border:none; color:#d46b82; font-size:14px; cursor:pointer; padding:0;">🗑️</button>
                         </div>
                     </div>
-                   <div style="margin-top:5px;">${splits}</div>${receiptBadge}
+                  <div style="margin-top:5px; font-weight:bold;">${splits}</div>
                 </div>`;
         });
 
@@ -471,8 +471,8 @@ const receiptBadge = exp.receipt ? `<div style="margin-top:6px;"><img src="${exp
         });
         if (Object.values(pmTotals).some(v => v > 0)) {
             resultBox.innerHTML += `
-                <p style="font-weight:bold; color:#555; font-size:13px; margin:15px 0 8px;">💳 ${t.paymentBreakdown}</p>
-                <div style="background:white; padding:12px; border-radius:12px; margin-bottom:12px; box-shadow:0 2px 6px rgba(0,0,0,0.05);">
+                <p style="font-weight:bold; color:${document.body.classList.contains('dark-mode') ? 'white' : '#555'}; font-size:13px; margin:15px 0 8px;">💳 ${t.paymentBreakdown}</p>
+                <div style="background:${document.body.classList.contains('dark-mode') ? '#2d2d2d' : 'white'}; padding:12px; border-radius:12px; margin-bottom:12px; box-shadow:0 2px 6px rgba(0,0,0,0.05);">
                     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
                         <span style="font-size:13px;">📱 UPI</span>
                         <span style="font-weight:bold; color:#2d8cff;">${window.currentCurrency}${pmTotals.UPI.toFixed(2)}</span>
@@ -490,7 +490,7 @@ const receiptBadge = exp.receipt ? `<div style="margin-top:6px;"><img src="${exp
     }
 
     // Settle up section — with simplified debts
-    resultBox.innerHTML += `<p style="font-weight:bold; color:#555; font-size:13px; margin:15px 0 8px;">${t.settleUp}</p>`;
+    resultBox.innerHTML += `<p style="font-weight:bold; color:${document.body.classList.contains('dark-mode') ? 'white' : '#555'}; font-size:13px; margin:15px 0 8px;">${t.settleUp}</p>`;
     const owedMap = {};
     window.currentGroup.members.forEach(m => owedMap[m] = 0);
     (window.currentGroup.expenses || []).forEach(exp => {
@@ -529,8 +529,8 @@ const receiptBadge = exp.receipt ? `<div style="margin-top:6px;"><img src="${exp
         if (owed > 0.01) {
             anyUnsettled = true;
             resultBox.innerHTML += `
-                <div style="background:white; padding:12px; border-radius:12px; margin-bottom:8px; display:flex; justify-content:space-between; align-items:center; box-shadow:0 2px 6px rgba(0,0,0,0.05);">
-                    <div><span style="font-size:13px; color:#333;">${member.trim()}</span><br>
+                <div style="background:${document.body.classList.contains('dark-mode') ? '#2d2d2d' : 'white'}; padding:12px; border-radius:12px; margin-bottom:8px; display:flex; justify-content:space-between; align-items:center; box-shadow:0 2px 6px rgba(0,0,0,0.05);">
+                    <div><span style="font-size:13px; color:${document.body.classList.contains('dark-mode') ? 'white' : '#333'};">${member.trim()}</span><br>
                     <span style="color:#d46b82; font-size:12px;">${t.owes} ${window.currentCurrency}${owed.toFixed(2)}</span></div>
                     <button onclick="settleUp('${member}', ${owed})"
                         style="background:#5b8f67; color:white; border:none; padding:8px 12px; border-radius:10px; font-size:12px; cursor:pointer;">${t.settle}</button>
@@ -544,12 +544,12 @@ const receiptBadge = exp.receipt ? `<div style="margin-top:6px;"><img src="${exp
 
     // Settlement history in group view
     if ((window.currentGroup.settled || []).length > 0) {
-        resultBox.innerHTML += `<p style="font-weight:bold; color:#555; font-size:13px; margin:15px 0 8px;">📋 ${t.settlementHistory}</p>`;
+        resultBox.innerHTML += `<p style="font-weight:bold; color:${document.body.classList.contains('dark-mode') ? 'white' : '#555'};; font-size:13px; margin:15px 0 8px;">📋 ${t.settlementHistory}</p>`;
         [...window.currentGroup.settled].reverse().forEach(s => {
             resultBox.innerHTML += `
-                <div style="background:white; padding:10px; border-radius:10px; margin-bottom:6px; display:flex; justify-content:space-between; align-items:center; box-shadow:0 1px 4px rgba(0,0,0,0.04);">
+                <div style="background:${document.body.classList.contains('dark-mode') ? '#2d2d2d' : 'white'}; padding:10px; border-radius:10px; margin-bottom:6px; display:flex; justify-content:space-between; align-items:center; box-shadow:0 1px 4px rgba(0,0,0,0.04);">
                     <div>
-                        <span style="font-size:13px; color:#333; font-weight:bold;">${s.member}</span>
+                        <span style="font-size:13px; color:${document.body.classList.contains('dark-mode') ? 'white' : '#333'}; font-weight:bold;">${s.member}</span>
                         <span style="font-size:11px; color:#aaa; margin-left:6px;">${s.date || ''}</span>
                     </div>
                     <span style="color:#5b8f67; font-weight:bold; font-size:13px;">✓ ${window.currentCurrency}${s.amount.toFixed(2)}</span>
@@ -591,10 +591,10 @@ window.renderSettlementHistory = function () {
         container.innerHTML += `<p style="font-weight:bold; color:#555; font-size:13px; margin:12px 0 6px;">👥 ${groupName}</p>`;
         settlements.forEach(s => {
             container.innerHTML += `
-                <div style="background:white; padding:12px; border-radius:12px; margin-bottom:8px; display:flex; justify-content:space-between; align-items:center; box-shadow:0 2px 6px rgba(0,0,0,0.05);">
+                <div style="background:${document.body.classList.contains('dark-mode') ? '#2d2d2d' : 'white'}; padding:12px; border-radius:12px; margin-bottom:8px; display:flex; justify-content:space-between; align-items:center; box-shadow:0 2px 6px rgba(0,0,0,0.05);">
                     <div>
-                        <span style="font-size:13px; color:#333; font-weight:bold;">${s.member}</span><br>
-                        <span style="font-size:11px; color:#aaa;">${s.date || ''} ${s.time || ''}</span>
+                        <span style="font-size:13px; color:${document.body.classList.contains('dark-mode') ? 'white' : '#333'}; font-weight:bold;">${s.member}</span><br>
+                        <span style="font-size:11px; color:${document.body.classList.contains('dark-mode') ? 'white' : '#aaa'};">${s.date || ''} ${s.time || ''}</span>
                     </div>
                     <span style="color:#5b8f67; font-weight:bold;">✓ ${window.currentCurrency}${s.amount.toFixed(2)}</span>
                 </div>`;
@@ -653,7 +653,7 @@ window.renderAnalytics = function () {
         const colors = { '🍔 Food': '#f97316', '🚗 Travel': '#2d8cff', '🏠 Rent': '#a855f7', '🎉 Fun': '#f7c948', '🛒 Shopping': '#d46b82', '💡 Bills': '#5b8f67' };
         const color = colors[cat] || '#888';
         container.innerHTML += `
-            <div style="background:white; padding:10px 12px; border-radius:10px; margin-bottom:6px; box-shadow:0 1px 4px rgba(0,0,0,0.04);">
+            <div style="background:${document.body.classList.contains('dark-mode') ? '#2d2d2d' : 'white'}; padding:10px 12px; border-radius:10px; margin-bottom:6px; box-shadow:0 1px 4px rgba(0,0,0,0.04);">
                 <div style="display:flex; justify-content:space-between; margin-bottom:5px; font-size:13px;">
                     <span>${cat}</span>
                     <span style="font-weight:bold;">${window.currentCurrency}${amt.toFixed(2)} <span style="color:#aaa; font-weight:normal;">(${pct}%)</span></span>
@@ -748,6 +748,7 @@ function downloadCSV(rows, filename) {
 window.setTheme = function (mode) {
     const sidebar = document.querySelector('.sidebar');
     if (mode === 'dark') {
+        localStorage.setItem('theme', 'dark');
         document.body.classList.add('dark-mode');
 
         document.body.style.background = '#1a1a1a';
@@ -756,6 +757,7 @@ window.setTheme = function (mode) {
         sidebar.style.color = 'white';
 
     } else {
+        localStorage.setItem('theme', 'light');
         document.body.classList.remove('dark-mode');
 
         document.body.style.background = '';
@@ -1262,3 +1264,6 @@ window.filterExpenses = function (query) {
         card.style.display = card.textContent.toLowerCase().includes(query.toLowerCase()) ? 'block' : 'none';
     });
 };
+if (localStorage.getItem("theme") === "dark") {
+    setTheme("dark");
+}

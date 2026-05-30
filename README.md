@@ -507,6 +507,8 @@ if(amount <= 0){
 ---
 
 ```
+---
+
 ## 🚀 Development Journey
 
 The development of EquaPay was completed through a structured engineering workflow over multiple stages.This app was built for a junior-level technical competition conducted by our college. Every week, we attempted a series of given challenges that are showcased here:
@@ -549,7 +551,6 @@ The development of EquaPay was completed through a structured engineering workfl
 
 4. The Production-Ready Technical README: The README.md file was finalized.
 
-
 ### Key Challenges Faced
 
 * Backend-database connection setup
@@ -567,6 +568,7 @@ Through this project, the team gained practical experience in:
 * Debugging and testing
 * Software documentation
 
+---
 
 ## 📈 Future Improvements
 
@@ -580,35 +582,50 @@ Through this project, the team gained practical experience in:
 
 ---
 ## 📸 Final Gallery
-    - welcome-page
-      <img width="1347" height="638" alt="GET STARTED" src="https://github.com/user-attachments/assets/089516de-8392-480b-9795-bc25fe4f85a1" />
 
-    - login/sign in page
-      <img width="1920" height="911" alt="AUTH" src="https://github.com/user-attachments/assets/ee6d146d-a53d-4d84-8f52-e48c7fe9461d" />
+## Welcome Page
+![GET STARTED](IMAGES/GET-STARTED.png)
 
-    - Dashboard page
-      <img width="1920" height="920" alt="GROUPS" src="https://github.com/user-attachments/assets/80f42138-5933-42a9-aa34-aed30bfbd450" />
+### Login / Sign In Page
+![AUTH](images/AUTH.png)
 
-    - create group page
-      <img width="1920" height="925" alt="CREATE GROUP" src="https://github.com/user-attachments/assets/c8af4cb4-d1cd-48ad-99c0-ab7ce52d818f" />
+### Groups Page
+![GROUPS](images/GROUPS.png)
 
-    - add expense page
-      <img width="1919" height="913" alt="ADD EXPENSE" src="https://github.com/user-attachments/assets/1b12cbda-2223-4769-8ce1-ec073c833918" />
+### Create Group Page
+![CREATE GROUP](images/CREATE-GROUP.png)
 
-     - Settlement page
-       <img width="1920" height="911" alt="SETTLEMENT-HISTORY" src="https://github.com/user-attachments/assets/e322a447-3abe-47fa-a5fd-9558840559c7" />
+### Expense History Page
+![EXPENSE HISTORY](images/EXPENSE-HISTORY.png)
 
-     - Analytics page
-        <img width="1920" height="920" alt="ANALYTICS " src="https://github.com/user-attachments/assets/a4553036-4b58-4668-89c7-886c505be5b2" />
+### Settlement History Page
+![SETTLEMENT HISTORY](images/SETTLEMENT-HISTORY.png)
 
-      - Settings page
-      <img width="1920" height="937" alt="MENU" src="https://github.com/user-attachments/assets/d50ee2bf-b49e-4b4e-acc9-a87aa0de2ec3" />
+### Analytics Page
+![ANALYTICS](images/ANALYTICS.png)
 
-      - Flowchart page
-      <img width="1046" height="683" alt="image" src="https://github.com/user-attachments/assets/f108b4c3-1f20-49b7-ae64-a21821019ab9" />
+### Currency Converter Page
+![CURRENCY](images/CURRENCY.png)
 
+### Languages Page
+![LANGUAGES](images/LANGUAGES.png)
 
+### Light Mode
+![LIGHT MODE](images/LIGHT-MODE.png)
 
+### Dark Mode
+![DARK MODE](images/DARK-MODE.png)
+
+### Notifications
+![NOTIFICATIONS](images/NOTIFICATIONS.png)
+
+### Reminders
+![REMINDER](images/REMINDER.png)
+
+### Menu Page
+![MENU](images/MENU.png)
+
+---
 
 ## 🤝 Contributors
 
@@ -640,4 +657,4 @@ of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
 to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 copies of the Software.
-
+---
