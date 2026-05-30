@@ -155,6 +155,7 @@ Money-related misunderstandings are a common source of conflict in groups. EquaP
 - ✅ CSV Export
 - ✅ Multi-Language Support
 - ✅ Dark Mode
+- ✅ Light Mode
 - ✅ Email Verification
 - ✅ Password Reset
 - ✅ Responsive Design
