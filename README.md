@@ -645,3 +645,7 @@ to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 copies of the Software.
 
 ---
+
+## Live Demo
+
+🔗 [Open EquaPay App](https://equapay-52729.web.app/)
